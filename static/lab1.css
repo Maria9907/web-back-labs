@@ -1,0 +1,51 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%; /* Установите высоту 100% для html и body */
+}
+
+img {
+  width: 75%;
+  height: auto;
+  display: block;
+  margin: auto;
+}
+
+body {
+  background-color: #a86fbd;
+}
+h1 {
+  text-align: center;
+}
+
+/* Стили для страницы 404 */
+.error-404-container {
+  font-family: sans-serif;
+  text-align: center;
+  background-image: url("https://play-lh.googleusercontent.com/7NpUM5RI3OUNmaBcoXI4jBJA2dzuAG2JmdJHlcwRgtx3nw8W61nTO-CgtWe6-AR2XQ=w7680-h4320");
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white; 
+}
+
+.error-404-container h1 {
+  font-size: 15em;
+}
+
+.error-404-container p {
+  font-size: 1.2em;
+}
+
+.error-404-container a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.error-404-container a:hover {
+  text-decoration: underline;
+}

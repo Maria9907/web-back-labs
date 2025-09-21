@@ -9,7 +9,24 @@ from flask import abort
 
 @app.errorhandler(404)
 def not_found(err):
-    return "Нет такой страницы", 404
+    css_path = url_for("static", filename="lab1.css")
+    return (
+        f"""<!DOCTYPE html>
+<html>
+<head>
+    <title>Ошибка 404</title>
+    <link rel="stylesheet" type="text/css" href="{css_path}">
+</head>
+<body>
+    <div class="error-404-container">
+        <h1>404</h1>
+        <p>Страница, которую вы ищете, не найдена.</p>
+        <p><a href="/">Вернуться на главную</a></p>
+    </div>
+</body>
+</html>""",
+        404,
+    )
 
 
 @app.errorhandler(400)
