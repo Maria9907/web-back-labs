@@ -247,3 +247,18 @@ def lab1():
     <body>
 </html>
 """
+
+
+@app.route("/lab1/error")  # Исправлено: теперь функция связана с URL
+def cause_error():
+    try:
+        result = 1 / 0  # Деление на ноль вызывает ошибку
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        abort(500)
+    return "This will not be reached"
+
+
+@app.errorhandler(500)
+def internal_server_error(err):
+    return "Внутренняя ошибка сервера", 500
