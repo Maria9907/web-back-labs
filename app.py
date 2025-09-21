@@ -4,9 +4,62 @@ import datetime
 app = Flask(__name__)
 
 
+from flask import abort
+
+
 @app.errorhandler(404)
 def not_found(err):
-    return "нет такой страницы", 404
+    return "Нет такой страницы", 404
+
+
+@app.errorhandler(400)
+def bad_request(err):
+    return "Неправильный, некорректный запрос", 400
+
+
+@app.errorhandler(401)
+def unauthorized(err):
+    return "Не авторизован", 401
+
+
+@app.errorhandler(403)
+def forbidden(err):
+    return "Запрещено (не уполномочен)", 403
+
+
+@app.errorhandler(405)
+def method_not_allowed(err):
+    return "Метод не поддерживается", 405
+
+
+@app.errorhandler(418)
+def teapot(err):
+    return "Я - чайник", 418
+
+
+@app.route("/lab1/400")
+def route_bad_request():
+    abort(400, description="Неправильный, некорректный запрос")
+
+
+@app.route("/lab1/401")
+def route_unauthorized():
+    abort(401, description="Не авторизован")
+
+
+@app.route("/lab1/403")
+def route_forbidden():
+    abort(403, description="Запрещено (не уполномочен)")
+
+
+@app.route("/lab1/405")
+def route_method_not_allowed():
+    abort(405, description="Метод не поддерживается")
+
+
+@app.route("/lab1/418")
+def route_teapot():
+    abort(418, description="Я - чайник")
 
 
 @app.route("/lab1/web")
