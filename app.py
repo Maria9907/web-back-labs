@@ -16,7 +16,7 @@ def web():
         <html>
             <body>
                 <h1>web-сервер на flask</h1>
-                <a href="/author">author</a>
+                <a href="/lab1/author">author</a>
             <body>
         </html>""",
         200,
@@ -43,7 +43,7 @@ def author():
                 <p>Факультет: """
         + faculty
         + """</p>
-                <a href="/web">web</a>
+                <a href="/lab1/web">web</a>
             <body>
         </html>"""
     )
@@ -108,7 +108,7 @@ def counter():
         Ваш IP-адрес: """
         + client_ip
         + """<br>
-        <a href="/clear_counter">Очистить счетчик</a>
+        <a href="/lab1/clear_counter">Очистить счетчик</a>
     </body>
 </html>
 """
@@ -139,18 +139,41 @@ def created():
 @app.route("/")
 @app.route("/index")
 def index():
-    return f"""<!doctype html>
-    <html>
-        <head>
-            <title>НГТУ, ФБ, Лабораторные работы</title>
-        </head>
-        <body>
-            <h1>НГТУ, ФБ, WEB-программирование, часть 2. Список лабораторных:</h1>
-            <nav>
-                <a href="/lab1">Первая лабораторная</a>
-            </nav>
-            <footer>
-                <p>Матюшкина Мария Дмитриевна, ФБИ-32, 3 курс, 2025 год</p>
-            </footer>
-        </body>
-    </html>"""
+    return """
+<!doctype html>
+<html>
+    <head>
+        <title>НГТУ, ФБ, Лабораторные работы</title>
+    </head>
+    <body>
+        <h1>НГТУ, ФБ, WEB-программирование, часть 2. Список лабораторных:</h1>
+        <nav>
+            <a href="/lab1">Первая лабораторная</a>
+        </nav>
+        <footer>
+            <p>Матюшкина Мария Дмитриевна, ФБИ-32, 3 курс, 2025 год</p>
+        </footer>
+    </body>
+</html>
+"""
+
+
+@app.route("/lab1")
+def lab1():
+    return """
+<!doctype html>
+<html>
+    <head>
+        <title>Лабораторная 1</title>
+    </head>
+    <body>
+        <p>Flask — фреймворк для создания веб-приложений на языке
+            программирования Python, использующий набор инструментов
+            Werkzeug, а также шаблонизатор Jinja2. Относится к категории так
+            называемых микрофреймворков — минималистичных каркасов
+            веб-приложений, сознательно предоставляющих лишь самые ба-
+            зовые возможности.</p>
+        <a href="/">На главную</a>
+    <body>
+</html>
+"""
