@@ -1,4 +1,4 @@
-from flask import Flask, url_for, request, redirect
+from flask import Flask, url_for, request, redirect, make_response
 import datetime
 
 app = Flask(__name__)
@@ -123,9 +123,7 @@ def author():
 def image():
     path = url_for("static", filename="картинка.jpg")
     css_path = url_for("static", filename="lab1.css")
-    return (
-        f'''
-<!doctype html> 
+    html_content = f"""<!doctype html> 
 <html>
     <head>
         <title>Природа</title>
@@ -133,13 +131,14 @@ def image():
     </head>
     <body>
         <h1>Природа</h1>
-        <img src="'''
-        + path
-        + """">
+        <img src="{path}">
     </body>
-</html>
-"""
-    )
+</html>"""
+    response = make_response(html_content)
+    response.headers["Content-Language"] = "ru-RU"
+    response.headers["X-Custom-Header-1"] = "Hello"
+    response.headers["X-Custom-Header-2"] = "My lab job"
+    return response
 
 
 count = 0
@@ -256,7 +255,7 @@ def cause_error():
     except Exception as e:
         print(f"An error occurred: {e}")
         abort(500)
-    return "This will not be reached"
+    return "Ошибка"
 
 
 @app.errorhandler(500)
