@@ -134,3 +134,23 @@ def created():
 """,
         201,
     )
+
+
+@app.route("/")
+@app.route("/index")
+def index():
+    return f"""<!doctype html>
+    <html>
+        <head>
+            <title>НГТУ, ФБ, Лабораторные работы</title>
+        </head>
+        <body>
+            <h1>НГТУ, ФБ, WEB-программирование, часть 2. Список лабораторных:</h1>
+            <nav>
+                <a href="/lab1">Первая лабораторная</a>
+            </nav>
+            <footer>
+                <p>Матюшкина Мария Дмитриевна, ФБИ-32, 3 курс, 2025 год</p>
+            </footer>
+        </body>
+    </html>"""
