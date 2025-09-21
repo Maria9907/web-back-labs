@@ -75,6 +75,13 @@ def image():
 count = 0
 
 
+@app.route("/clear_counter")
+def clear_counter():
+    global count
+    count = 0
+    return redirect("/counter")
+
+
 @app.route("/counter")
 def counter():
     global count
@@ -101,6 +108,7 @@ def counter():
         Ваш IP-адрес: """
         + client_ip
         + """<br>
+        <a href="/clear_counter">Очистить счетчик</a>
     </body>
 </html>
 """
