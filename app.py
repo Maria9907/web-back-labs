@@ -1,32 +1,7 @@
-from flask import Flask, url_for, request, redirect, make_response
+from flask import Flask, url_for, request, redirect, make_response, abort
 import datetime
 
 app = Flask(__name__)
-
-
-from flask import abort
-
-
-@app.errorhandler(404)
-def not_found(err):
-    css_path = url_for("static", filename="lab1.css")
-    return (
-        f"""<!DOCTYPE html>
-<html>
-<head>
-    <title>Ошибка 404</title>
-    <link rel="stylesheet" type="text/css" href="{css_path}">
-</head>
-<body>
-    <div class="error-404-container">
-        <h1>404</h1>
-        <p>Страница, которую вы ищете, не найдена.</p>
-        <p><a href="/">Вернуться на главную</a></p>
-    </div>
-</body>
-</html>""",
-        404,
-    )
 
 
 @app.errorhandler(400)
@@ -229,7 +204,7 @@ def index():
 
 @app.route("/lab1")
 def lab1():
-    # Список всех роутов лабораторной работы
+
     routes = [
         ("/lab1/400", "400 - Неправильный запрос"),
         ("/lab1/401", "401 - Не авторизован"),
@@ -245,7 +220,6 @@ def lab1():
         ("/lab1/error", "Генерация ошибки"),
     ]
 
-    # Создаем HTML-код для списка роутов простым способом
     routes_html = ""
     for route_url, route_name in routes:
         routes_html += f'<li><a href="{route_url}">{route_name}</a></li>'
@@ -274,10 +248,10 @@ def lab1():
 """
 
 
-@app.route("/lab1/error")  # Исправлено: теперь функция связана с URL
+@app.route("/lab1/error")
 def cause_error():
     try:
-        result = 1 / 0  # Деление на ноль вызывает ошибку
+        result = 1 / 0
     except Exception as e:
         print(f"An error occurred: {e}")
         abort(500)
@@ -287,3 +261,55 @@ def cause_error():
 @app.errorhandler(500)
 def internal_server_error(err):
     return "Внутренняя ошибка сервера", 500
+
+
+access_log = []
+
+
+@app.errorhandler(404)
+def not_found(err):
+    # Получаем информацию о текущем запросе
+    client_ip = request.remote_addr
+    access_time = datetime.datetime.now()
+    requested_url = request.url
+
+    # Добавляем запись в журнал
+    log_entry = (
+        f"[{access_time}, пользователь {client_ip}] зашёл на адрес: {requested_url}"
+    )
+    access_log.append(log_entry)
+
+    css_path = url_for("static", filename="lab1.css")
+
+    # Формируем HTML для журнала
+    log_html = ""
+    for entry in access_log:
+        log_html += f"<p class='log-entry'>{entry}</p>"
+
+    return (
+        f"""<!DOCTYPE html>
+<html>
+<head>
+    <title>Ошибка 404</title>
+    <link rel="stylesheet" type="text/css" href="{css_path}">
+    
+</head>
+<body>
+    <div class="error-404-container">
+        <h1>404</h1>
+        <p>Страница, которую вы ищете, не найдена.</p>
+        <p><strong>Ваш IP-адрес:</strong> {client_ip}</p>
+        <p><strong>Дата доступа:</strong> {access_time}</p>
+        <p><a href="/">Вернуться на главную</a></p>
+        
+        <div class="access-log-container">
+            <h2>Журнал посещений:</h2>
+            <div class="log-entries">
+                {log_html}
+            </div>
+        </div>
+    </div>
+</body>
+</html>""",
+        404,
+    )

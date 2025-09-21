@@ -11,41 +11,61 @@ img {
   margin: auto;
 }
 
-body {
-  background-color: #a86fbd;
-}
+
 h1 {
   text-align: center;
 }
 
 /* Стили для страницы 404 */
+.access-log-container {
+margin-top: 20px;
+background-color: rgba(0, 0, 0, 0.5);
+padding: 15px;
+border-radius: 10px;
+max-width: 800px;
+width: 90%;
+margin: 20px auto;
+}
+
+.log-entries {
+max-height: 200px;
+overflow-y: auto;
+margin-top: 10px;
+}
+
+.log-entry {
+padding: 5px;
+margin: 5px 0;
+background-color: rgba(255, 255, 255, 0.1);
+border-radius: 3px;
+font-family: monospace;
+font-size: 0.9em;
+}
+
 .error-404-container {
-  font-family: sans-serif;
-  text-align: center;
-  background-image: url("https://play-lh.googleusercontent.com/7NpUM5RI3OUNmaBcoXI4jBJA2dzuAG2JmdJHlcwRgtx3nw8W61nTO-CgtWe6-AR2XQ=w7680-h4320");
-  background-size: cover;
-  background-position: center;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: white; 
+font-family: sans-serif;
+text-align: center;
+background-image: url("https://play-lh.googleusercontent.com/7NpUM5RI3OUNmaBcoXI4jBJA2dzuAG2JmdJHlcwRgtx3nw8W61nTO-CgtWe6-AR2XQ=w7680-h4320");
+background-position: center;
+height: 130vh;
+align-items: center;
+color: white; 
 }
 
 .error-404-container h1 {
-  font-size: 15em;
+font-size: 15em;
+margin:0;
 }
 
 .error-404-container p {
-  font-size: 1.2em;
+font-size: 1.2em;
 }
 
 .error-404-container a {
-  color: #ffffff;
-  text-decoration: none;
+color: #ffffff;
+text-decoration: none;
 }
 
 .error-404-container a:hover {
-  text-decoration: underline;
+text-decoration: underline;
 }
