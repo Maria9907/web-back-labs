@@ -268,12 +268,12 @@ access_log = []
 
 @app.errorhandler(404)
 def not_found(err):
-    # Получаем информацию о текущем запросе
+   
     client_ip = request.remote_addr
     access_time = datetime.datetime.now()
     requested_url = request.url
 
-    # Добавляем запись в журнал
+   
     log_entry = (
         f"[{access_time}, пользователь {client_ip}] зашёл на адрес: {requested_url}"
     )
@@ -281,7 +281,7 @@ def not_found(err):
 
     css_path = url_for("static", filename="lab1.css")
 
-    # Формируем HTML для журнала
+    
     log_html = ""
     for entry in access_log:
         log_html += f"<p class='log-entry'>{entry}</p>"
