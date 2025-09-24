@@ -313,3 +313,13 @@ def not_found(err):
 </html>""",
         404,
     )
+
+
+
+
+@app.route('/lab2/a')
+def a():
+    return 'без слэша'
+@app.route('/lab2/a/')
+def a2():
+    return 'со слэшем'
