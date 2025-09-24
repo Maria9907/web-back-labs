@@ -1,4 +1,12 @@
-from flask import Flask, url_for, request, redirect, make_response, abort, render_template
+from flask import (
+    Flask,
+    url_for,
+    request,
+    redirect,
+    make_response,
+    abort,
+    render_template,
+)
 import datetime
 
 app = Flask(__name__)
@@ -268,12 +276,11 @@ access_log = []
 
 @app.errorhandler(404)
 def not_found(err):
-   
+
     client_ip = request.remote_addr
     access_time = datetime.datetime.now()
     requested_url = request.url
 
-   
     log_entry = (
         f"[{access_time}, пользователь {client_ip}] зашёл на адрес: {requested_url}"
     )
@@ -281,7 +288,6 @@ def not_found(err):
 
     css_path = url_for("static", filename="lab1.css")
 
-    
     log_html = ""
     for entry in access_log:
         log_html += f"<p class='log-entry'>{entry}</p>"
@@ -315,28 +321,31 @@ def not_found(err):
     )
 
 
-
-
-@app.route('/lab2/a')
+@app.route("/lab2/a")
 def a():
-    return 'без слэша'
-@app.route('/lab2/a/')
+    return "без слэша"
+
+
+@app.route("/lab2/a/")
 def a2():
-    return 'со слэшем'
+    return "со слэшем"
 
-flower_list = ['роза', 'тюльпан', 'незабудка', 'ромашка']
 
-@app.route('/lab2/flowers/<int:flower_id>')
+flower_list = ["роза", "тюльпан", "незабудка", "ромашка"]
+
+
+@app.route("/lab2/flowers/<int:flower_id>")
 def flowers(flower_id):
     if flower_id >= len(flower_list):
         abort(404)
     else:
         return "цветок: " + flower_list[flower_id]
 
-@app.route('/lab2/add_flower/<name>')
-def add_flower(name) :
+
+@app.route("/lab2/add_flower/<name>")
+def add_flower(name):
     flower_list.append(name)
-    return f'''
+    return f"""
 <!doctype html> 
 <html>
     <body>
@@ -346,18 +355,24 @@ def add_flower(name) :
     <p>Полный список: {flower_list} </p>
     </body>
 </html>
-'''
-@app.route('/lab2/example')
+"""
+
+
+@app.route("/lab2/example")
 def example():
-    name, group, course, lab = 'Матюшкина Мария', 'ФБИ-32', '3 курс', '2'
+    name, group, course, lab = "Матюшкина Мария", "ФБИ-32", "3 курс", "2"
     fruits = [
-        {'name':'яблоки', 'price': 100 },
-        {'name':'груши', 'price': 120 },
-        {'name':'апельсины', 'price': 80 },
-        {'name':'мандарины', 'price': 95 },
-        {'name':'манго', 'price': 321 }
+        {"name": "яблоки", "price": 100},
+        {"name": "груши", "price": 120},
+        {"name": "апельсины", "price": 80},
+        {"name": "мандарины", "price": 95},
+        {"name": "манго", "price": 321},
     ]
-    return render_template('example.html', name=name, group=group, 
-                            course=course, lab=lab,
-                            fruits=fruits)
-     
+    return render_template(
+        "example.html", name=name, group=group, course=course, lab=lab, fruits=fruits
+    )
+
+
+@app.route("/lab2/")
+def lab2():
+    return render_template("lab2.html")
