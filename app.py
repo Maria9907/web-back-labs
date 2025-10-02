@@ -338,8 +338,26 @@ flower_list = ["роза", "тюльпан", "незабудка", "ромашк
 def flowers(flower_id):
     if flower_id >= len(flower_list):
         abort(404)
-    else:
-        return "цветок: " + flower_list[flower_id]
+    return f"""
+<!doctype html>
+<html>
+    <head>
+        <title>Цветок #{flower_id}</title>
+    </head>
+    <body>
+        <h1>Информация о цветке</h1>
+        <p>ID цветка: {flower_id}</p>
+        <p>Название: {flower_list[flower_id]}</p>
+        <a href="{url_for('show_all_flowers')}">Посмотреть все цветы</a>
+    </body>
+</html>
+"""
+
+
+@app.route("/lab2/add_flower/")
+def add_flower_no_name():
+    response = make_response("вы не задали имя цветка", 400)
+    return response
 
 
 @app.route("/lab2/add_flower/<name>")
@@ -357,6 +375,28 @@ def add_flower(name):
 </html>
 """
 
+
+@app.route("/lab2/all_flowers")
+def show_all_flowers():
+    num_flowers = len(flower_list)
+    return f"Всего цветов: {num_flowers}\nСписок цветов: {', '.join(flower_list)}"
+
+@app.route("/lab2/clear")
+def clear_flowers():
+    flower_list.clear()
+    return f"""
+<!doctype html>
+<html>
+    <head>
+        <title>Список очищен</title>
+    </head>
+    <body>
+        <h1>Список цветов очищен!</h1>
+        <p>Все цветы были удалены из коллекции.</p>
+        <a href="{url_for('show_all_flowers')}">Вернуться к списку цветов</a>
+    </body>
+</html>
+"""
 
 @app.route("/lab2/example")
 def example():
@@ -376,3 +416,9 @@ def example():
 @app.route("/lab2/")
 def lab2():
     return render_template("lab2.html")
+
+
+@app.route("/lab2/filters")
+def filters():
+    phrase = "О <b>сколько</b> <u>нам</u> <i>открытий</i> чудных..."
+    return render_template("filter.html", phrase=phrase)
