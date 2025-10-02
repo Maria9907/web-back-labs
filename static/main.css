@@ -1,19 +1,19 @@
 body {
     margin: 0;
     font-family: monospace;
+    
 }
 main {
-    margin-bottom: 40px;
+    margin-bottom: 60px;
     padding: 10px;
+    padding-top:0 ;
     
 }
 header {
-    margin-bottom: 30px;
+    
     padding: 20px;
     background: lightpink;
     font-weight: bold;
-    
-
 }
 footer {
     margin-top: 20px;
@@ -24,4 +24,14 @@ footer {
     bottom: 0;
     left: 0;
     right: 0;
+}
+table {
+    border: 1px solid #34495e; 
+    
+}
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    border-right: 1px solid #ddd; /* Добавляем вертикальные границы */
 }

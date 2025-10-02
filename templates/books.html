@@ -1,0 +1,30 @@
+{% extends "base.html" %} {# номер лабораторной работы: #} {% block lab
+%}Лабораторная работа 2{% endblock %} {# основной контент: #} {% block main %}
+
+ <h2 > Библиотека классической литературы</h2>
+    
+    <div class="stats">
+        <strong>Всего книг в коллекции: {{ books|length }}</strong> | 
+        <strong>Общее количество страниц: {{ books|sum(attribute='pages') }}</strong>
+    </div>
+
+    <table>
+        <tr>
+            <th>№</th>
+            <th>Автор</th>
+            <th>Название книги</th>
+            <th>Жанр</th>
+            <th>Страниц</th>
+        </tr>
+    
+        {% for book in books %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td><strong>{{ book.author }}</strong></td>
+            <td>{{ book.title }}</td>
+            <td><span class="genre-tag">{{ book.genre }}</span></td>
+            <td class="pages">{{ book.pages }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
