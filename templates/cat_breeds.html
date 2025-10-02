@@ -1,0 +1,32 @@
+{% extends "base.html" %} {# номер лабораторной работы: #} {% block lab
+%}Лабораторная работа 2{% endblock %} {# основной контент: #} {% block main %}
+
+<div class="container">
+    
+        <h1 id="h11">Энциклопедия пород кошек</h1>
+        
+    
+    
+    <div class="stats">
+        <h2>В коллекции представлено <strong>{{ cat_breeds|length }}</strong> пород кошек</h2>
+    </div>
+    
+    <div class="breeds-grid">
+        {% for breed in cat_breeds %}
+        <div class="breed-card">
+            <img src="{{ url_for('static', filename='cats/' + breed.image) }}" 
+                 alt="{{ breed.breed }}" 
+                 class="breed-image">
+            <div class="image-placeholder" style="display: none;">
+                Изображение: {{ breed.breed }}
+            </div>
+            
+            <div class="breed-content">
+                <h3 class="breed-name">{{ breed.breed }}</h3>
+                <p class="breed-description">{{ breed.description }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
