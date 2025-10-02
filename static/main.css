@@ -6,15 +6,17 @@ body {
 main {
     margin-bottom: 60px;
     padding: 10px;
-    padding-top:0 ;
+    
     
 }
 header {
-    
+    display: flex;
     padding: 20px;
     background: lightpink;
     font-weight: bold;
     font-size: 20px;
+    justify-content: space-between;
+    align-items: center;
 }
 footer {
     margin-top: 20px;
