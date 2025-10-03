@@ -379,6 +379,11 @@ def add_flower_post():
     else:
         return render_template('error.html', message="Не указано имя или цена цветка"), 400
 
+@app.route("/lab2/clear")
+def clear_flowers():
+    flower_list.clear()
+    return render_template('clear_flowers.html')
+
 @app.route("/lab2/all_flowers")
 def show_all_flowers():
     return render_template('all_flowers.html', flowers=flower_list)
