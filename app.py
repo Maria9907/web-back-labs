@@ -337,27 +337,21 @@ def a2():
     return "со слэшем"
 
 
-flower_list = ["роза", "тюльпан", "незабудка", "ромашка"]
-
+flower_list = [
+    {'name': 'роза', 'price': 300},
+    {'name': 'тюльпан', 'price': 310},
+    {'name': 'незабудка', 'price': 320},
+    {'name': 'ромашка', 'price': 330},
+    {'name': 'георгин', 'price': 300},
+    {'name': 'гладиолус', 'price': 310}
+]
 
 @app.route("/lab2/flowers/<int:flower_id>")
 def flowers(flower_id):
-    if flower_id >= len(flower_list):
+    if flower_id < 0 or flower_id >= len(flower_list):
         abort(404)
-    return f"""
-<!doctype html>
-<html>
-    <head>
-        <title>Цветок #{flower_id}</title>
-    </head>
-    <body>
-        <h1>Информация о цветке</h1>
-        <p>ID цветка: {flower_id}</p>
-        <p>Название: {flower_list[flower_id]}</p>
-        <a href="{url_for('show_all_flowers')}">Посмотреть все цветы</a>
-    </body>
-</html>
-"""
+    flower = flower_list[flower_id]
+    return render_template('one_flower.html', flower=flower, flower_id=flower_id)
 
 
 @app.route("/lab2/add_flower/")
@@ -368,41 +362,34 @@ def add_flower_no_name():
 
 @app.route("/lab2/add_flower/<name>")
 def add_flower(name):
-    flower_list.append(name)
-    return f"""
-<!doctype html> 
-<html>
-    <body>
-    <h1>Добавлен новый цветок</h1>
-    <p>Название нового цветка: {name} </p>
-    <p>Всего цветков: {len(flower_list)} </p>
-    <p>Полный список: {flower_list} </p>
-    </body>
-</html>
-"""
+    flower_list.append({'name': name, 'price': 0})
+    return render_template('add_flower.html', 
+                          name=name, 
+                          price=0,
+                          count=len(flower_list),
+                          flowers=flower_list)
 
+@app.route("/lab2/add_flower", methods=['POST'])
+def add_flower_post():
+    name = request.form.get('name')
+    price = request.form.get('price')
+    if name and price:
+        flower_list.append({'name': name, 'price': int(price)})
+        return redirect(url_for('show_all_flowers'))
+    else:
+        return render_template('error.html', message="Не указано имя или цена цветка"), 400
 
 @app.route("/lab2/all_flowers")
 def show_all_flowers():
-    num_flowers = len(flower_list)
-    return f"Всего цветов: {num_flowers}\nСписок цветов: {', '.join(flower_list)}"
+    return render_template('all_flowers.html', flowers=flower_list)
 
-@app.route("/lab2/clear")
-def clear_flowers():
-    flower_list.clear()
-    return f"""
-<!doctype html>
-<html>
-    <head>
-        <title>Список очищен</title>
-    </head>
-    <body>
-        <h1>Список цветов очищен!</h1>
-        <p>Все цветы были удалены из коллекции.</p>
-        <a href="{url_for('show_all_flowers')}">Вернуться к списку цветов</a>
-    </body>
-</html>
-"""
+
+@app.route("/lab2/del_flower/<int:flower_id>")
+def delete_flower(flower_id):
+    if flower_id < 0 or flower_id >= len(flower_list):
+        abort(404)
+    flower_list.pop(flower_id)
+    return redirect(url_for('show_all_flowers'))
 
 @app.route("/lab2/example")
 def example():
@@ -432,26 +419,11 @@ def filters():
 
 @app.route('/lab2/calc/<int:a>/<int:b>')
 def calc(a, b):
-    return f"""
-<!doctype html>
-<html>
-    <head>
-        <title>Калькулятор</title>
-    </head>
-    <body>
-        <h1>Расчёт с параметрами:</h1>
-        <p>{a} + {b} = {a + b}</p>
-        <p>{a} - {b} = {a - b}</p>
-        <p>{a} × {b} = {a * b}</p>
-        <p>{a} / {b} = {a / b if b != 0 else '∞ (деление на ноль)'}</p>
-        <p>{a}<sup>{b}</sup> = {a ** b}</p>
-    </body>
-</html>
-"""
+    return render_template('calc.html', a=a, b=b)
 
 @app.route('/lab2/calc/')
 def calc_default():
-    return redirect(url_for('calc', a=1, b=1))
+    return redirect('/lab2/calc/1/1')
 
 @app.route('/lab2/calc/<int:a>')
 def calc_single(a):
