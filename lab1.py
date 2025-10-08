@@ -2,9 +2,35 @@ from flask import Blueprint, redirect, url_for
 
 lab1 = Blueprint('lab1',__name__)
 
+
+
+@lab1.route("/lab1/400")
+def route_bad_request():
+    abort(400, description="Неправильный, некорректный запрос")
+
+
+@lab1.route("/lab1/401")
+def route_unauthorized():
+    abort(401, description="Не авторизован")
+
+
+@lab1.route("/lab1/403")
+def route_forbidden():
+    abort(403, description="Запрещено (не уполномочен)")
+
+
+@lab1.route("/lab1/405")
+def route_method_not_allowed():
+    abort(405, description="Метод не поддерживается")
+
+
+@lab1.route("/lab1/418")
+def route_teapot():
+    abort(418, description="Я - чайник")
+
+
 @lab1.route("/lab1/")
 def lab():
-
     routes = [
         ("/lab1/400", "400 - Неправильный запрос"),
         ("/lab1/401", "401 - Не авторизован"),
@@ -19,11 +45,9 @@ def lab():
         ("/lab1/info", "Перенаправление на автора"),
         ("/lab1/error", "Генерация ошибки"),
     ]
-
     routes_html = ""
     for route_url, route_name in routes:
         routes_html += f'<li><a href="{route_url}">{route_name}</a></li>'
-
     return f"""
 <!doctype html>
 <html>
@@ -38,7 +62,6 @@ def lab():
             веб-приложений, сознательно предоставляющих лишь самые ба-
             зовые возможности.</p>
         <a href="/">На главную</a>
-        
         <h2>Список роутов</h2>
         <ul>
             {routes_html}
@@ -46,7 +69,6 @@ def lab():
     </body>
 </html>
 """
-
 
 
 @lab1.route("/lab1/web")
@@ -128,7 +150,6 @@ def counter():
     time = datetime.datetime.today()
     url = request.url
     client_ip = request.remote_addr
-
     return (
         """
 <!doctype html> 
@@ -159,7 +180,7 @@ def info():
     return redirect("/lab1/author")
 
 
-@app.route("/created")
+@lab1.route("/created")
 def created():
     return (
         """
