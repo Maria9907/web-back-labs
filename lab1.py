@@ -1,4 +1,5 @@
-from flask import Blueprint, redirect, url_for
+from flask import Blueprint, redirect, url_for, abort, make_response, request
+from datetime import datetime
 
 lab1 = Blueprint('lab1',__name__)
 
@@ -133,7 +134,31 @@ def image():
     return response
 
 
-count = 0
+count = 0  # Глобальная переменная для счетчика
+
+
+@lab1.route("/lab1/counter")
+def counter():
+    global count
+    count += 1
+    time = datetime.now()
+    url = request.url
+    client_ip = request.remote_addr
+    
+    html_content = f"""
+<!doctype html> 
+<html>
+    <body>
+        Сколько раз вы сюда заходили: {count}
+        <hr>
+        Дата и время: {time}<br>
+        запрошенный адрес: {url}<br>
+        Ваш IP-адрес: {client_ip}<br>
+        <a href="/lab1/clear_counter">Очистить счетчик</a>
+    </body>
+</html>
+"""
+    return html_content
 
 
 @lab1.route("/lab1/clear_counter")
@@ -142,37 +167,6 @@ def clear_counter():
     count = 0
     return redirect("/lab1/counter")
 
-
-@lab1.route("/lab1/counter")
-def counter():
-    global count
-    count += 1
-    time = datetime.datetime.today()
-    url = request.url
-    client_ip = request.remote_addr
-    return (
-        """
-<!doctype html> 
-<html>
-    <body>
-        Сколько раз вы сюда заходили: """
-        + str(count)
-        + """
-        <hr>
-        Дата и время: """
-        + str(time)
-        + """<br>
-        запрошенный адрес: """
-        + url
-        + """<br>
-        Ваш IP-адрес: """
-        + client_ip
-        + """<br>
-        <a href="/lab1/clear_counter">Очистить счетчик</a>
-    </body>
-</html>
-"""
-    )
 
 
 @lab1.route("/lab1/info")

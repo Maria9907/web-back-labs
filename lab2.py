@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, url_for, render_template, make_response
+from flask import Blueprint, redirect, url_for, render_template, make_response, abort, request
 
 lab2 = Blueprint('lab2',__name__)
 
@@ -40,7 +40,7 @@ def add_flower_no_name():
 
 @lab2.route("/lab2/add_flower/<name>")
 def add_flower(name):
-    flower_list.lab2end({'name': name, 'price': 0})
+    flower_list.append({'name': name, 'price': 0})
     return render_template('add_flower.html', 
                           name=name, 
                           price=0,

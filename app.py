@@ -39,18 +39,6 @@ def method_not_allowed(err):
 def teapot(err):
     return "Я - чайник", 418
 
-
-
-
-
-
-
-    global count
-    count = 0
-    return redirect("/lab1/counter")
-
-
-
 @app.route("/")
 @app.route("/index")
 def index():
@@ -77,7 +65,6 @@ def index():
     </body>
 </html>
 """
-
 
 @app.errorhandler(500)
 def internal_server_error(err):
