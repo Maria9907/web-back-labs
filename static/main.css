@@ -87,3 +87,9 @@ th, td {
     justify-content: center;
     color: #666;
 }
+
+
+.error {
+    color: red;
+    
+}
