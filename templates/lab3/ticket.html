@@ -1,0 +1,66 @@
+{% extends "base.html" %} 
+
+{% block lab %}Лабораторная работа 3{% endblock %}
+
+{% block main %}
+    <h1>Ваш железнодорожный билет</h1>
+    
+    <div style="border: 2px solid #333; padding: 20px; max-width: 600px; margin: 20px auto; background-color: #f9f9f9;">
+        <h2 style="text-align: center; color: #2c3e50;">Железнодорожный билет</h2>
+        
+        <div style="margin-bottom: 15px;">
+            <strong>Пассажир:</strong> {{ last_name }} {{ first_name }} {{ middle_name }}
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <strong>Возраст:</strong> {{ age }} 
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <strong>Тип билета:</strong> {{ ticket_type }}
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <strong>Маршрут:</strong> {{ departure }} → {{ destination }}
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <strong>Дата поездки:</strong> {{ date }}
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <strong>Тип полки:</strong> 
+            {% if shelf == 'lower' %}Нижняя
+            {% elif shelf == 'upper' %}Верхняя
+            {% elif shelf == 'upper-side' %}Верхняя боковая
+            {% elif shelf == 'lower-side' %}Нижняя боковая
+            {% endif %}
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <strong>Дополнительные услуги:</strong>
+            {% set services = [] %}
+            {% if bedding == 'on' %}{% set services = services + ['Бельё'] %}{% endif %}
+            {% if luggage == 'on' %}{% set services = services + ['Багаж'] %}{% endif %}
+            {% if insurance == 'on' %}{% set services = services + ['Страховка'] %}{% endif %}
+            
+            {% if services %}
+                {{ services|join(', ') }}
+            {% else %}
+                Нет дополнительных услуг
+            {% endif %}
+        </div>
+                
+        <div style="margin-bottom: 15px; font-size: 1.2em;">
+            <strong>Стоимость билета:</strong> {{ price }} руб.
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ccc;">
+            <strong>Желаем приятной поездки!</strong>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="/lab3/form2">Оформить новый билет</a>
+    </div>
+{% endblock %}

@@ -118,4 +118,80 @@ def settings():
     return resp
 
 
+@lab3.route('/lab3/form2')
+def form2():
+    
+    last_name = request.args.get('last_name', '')
+    first_name = request.args.get('first_name', '')
+    middle_name = request.args.get('middle_name', '')
+    age = request.args.get('age', '')
+    departure = request.args.get('departure', '')
+    destination = request.args.get('destination', '')
+    date = request.args.get('date', '')
+    shelf = request.args.get('shelf', '')
+    bedding = request.args.get('bedding', '')
+    luggage = request.args.get('luggage', '')
+    insurance = request.args.get('insurance', '')
+    
+   
+    errors = {
+        'last_name': request.args.get('error_last_name', ''),
+        'first_name': request.args.get('error_first_name', ''),
+        'middle_name': request.args.get('error_middle_name', ''),
+        'age': request.args.get('error_age', ''),
+        'departure': request.args.get('error_departure', ''),
+        'destination': request.args.get('error_destination', ''),
+        'date': request.args.get('error_date', ''),
+        'shelf': request.args.get('error_shelf', '')
+    }
+    
+    return render_template('lab3/form2.html',
+                         last_name=last_name, first_name=first_name, middle_name=middle_name,
+                         age=age, departure=departure, destination=destination, date=date,
+                         shelf=shelf, bedding=bedding, luggage=luggage, insurance=insurance,
+                         errors=errors)
 
+
+
+
+@lab3.route('/lab3/ticket')
+def ticket():
+    last_name = request.args.get('last_name')
+    first_name = request.args.get('first_name')
+    middle_name = request.args.get('middle_name')
+    age = request.args.get('age')
+    departure = request.args.get('departure')
+    destination = request.args.get('destination')
+    date = request.args.get('date')
+    shelf = request.args.get('shelf')
+    bedding = request.args.get('bedding')
+    luggage = request.args.get('luggage')
+    insurance = request.args.get('insurance')
+    
+    age_int = int(age)
+    if age_int < 18:
+        ticket_type = "Детский билет"
+        price = 700
+    else:
+        ticket_type = "Взрослый билет" 
+        price = 1000
+    
+    
+    if shelf in ['lower', 'lower-side']:
+        price += 100
+    
+    if bedding == 'on':
+        price += 75
+    
+    if luggage == 'on':
+        price += 250
+    
+    if insurance == 'on':
+        price += 150
+    
+    
+    return render_template('lab3/ticket.html',
+                         last_name=last_name, first_name=first_name, middle_name=middle_name,
+                         age=age, departure=departure, destination=destination, date=date,
+                         shelf=shelf, bedding=bedding, luggage=luggage, insurance=insurance,
+                         ticket_type=ticket_type, price=price)
