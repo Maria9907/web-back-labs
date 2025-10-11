@@ -14,7 +14,7 @@
     <div class="breeds-grid">
         {% for breed in cat_breeds %}
         <div class="breed-card">
-            <img src="{{ url_for('static', filename='cats/' + breed.image) }}" 
+            <img src="{{ url_for('static', filename=breed.image) }}" 
                  alt="{{ breed.breed }}" 
                  class="breed-image">
             <div class="image-placeholder" style="display: none;">
