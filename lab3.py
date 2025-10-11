@@ -117,6 +117,15 @@ def settings():
                                        font_family=font_family))
     return resp
 
+@lab3.route('/lab3/settings/clear')
+def clear_settings():
+    resp = make_response(redirect('/lab3/settings'))
+    cookies_to_clear = ['color', 'bg_color', 'font_size', 'font_family']
+    for cookie_name in cookies_to_clear:
+        resp.set_cookie(cookie_name, '', expires=0)
+    return resp
+
+
 
 @lab3.route('/lab3/form2')
 def form2():
