@@ -1,0 +1,54 @@
+{% extends "base.html" %} 
+
+{# номер лабораторной работы: #}
+{% block lab %}Лабораторная работа 3{% endblock %}
+
+{# основной контент: #}
+{% block main %}
+    <h1>Cookies</h1>
+        <form>
+            <div style="margin-bottom:  5px; ">
+                <label for="color">Выберите цвет текста:</label>
+                <input type="color" id="color" name="color" value="{{ color or '' }}">
+            </div>
+            <div>
+                <button type="submit">Установить цвет текста</button>
+            </div>
+        </form>
+    
+        <form>
+            <div style="margin-bottom:  5px; ">
+                <label for="bg_color">Выберите цвет фона:</label>
+                <input  type="color" id="bg_color" name="bg_color" value="{{ bg_color or ''}}">
+            </div>
+            <div>
+                <button type="submit">Установить цвет фона</button>
+            </div>
+        </form>
+    
+        <form>
+            <div>
+                <label for="font_size">Выберите размер шрифта (px):</label>
+                <input type="number" id="font_size" name="font_size" value="{{ font_size or ''}}" min="10" max="30">
+            </div>
+            <div>
+                <button type="submit">Установить размер шрифта</button>
+            </div>
+        </form>
+    
+    
+        <form>
+            <div>
+                <label for="font_family">Выберите шрифт:</label>
+                <select id="font_family" name="font_family">
+                    <option value="monospace"{{ 'selected' if font_family == "'monospace', serif" else '' }}>Monospace(Стандартный)</option>
+                    <option value="Georgia, serif" {{ 'selected' if font_family == 'Georgia, serif' else '' }}>Georgia</option>
+                    <option value="Verdana, sans-serif" {{ 'selected' if font_family == 'Verdana, sans-serif' else '' }}>Verdana</option>
+                </select>
+            </div>
+            <div>
+                <button type="submit">Установить шрифт</button>
+            </div>
+        </form>
+    
+{% endblock %}
