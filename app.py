@@ -91,7 +91,7 @@ def not_found(err):
     )
     access_log.append(log_entry)
 
-    css_path = url_for("static", filename="lab1.css")
+    css_path = url_for("static", filename="lab1/lab1.css")
 
     log_html = ""
     for entry in access_log:
