@@ -1,0 +1,73 @@
+{% extends "base.html" %} 
+
+{% block lab %}Лабораторная работа 3{% endblock %}
+
+{% block main %}
+
+
+<h1>Поиск смартфонов</h1>
+
+<div >
+    <form>
+        <div >
+            <div>
+                <label for="min_price">Минимальная цена:</label>
+                <input type="number" id="min_price" name="min_price" 
+                       value="{{ min_price }}"
+                       placeholder="{{ global_min_price }}"
+                       min="0">
+            </div>
+            <div>
+                <label for="max_price">Максимальная цена:</label>
+                <input type="number" id="max_price" name="max_price" 
+                       value="{{ max_price }}"
+                       placeholder="{{ global_max_price }}"
+                       min="0">
+            </div>
+        </div>
+        
+        <div >
+            <button type="submit" name="search" value="1">Искать</button>
+            <button type="submit" name="reset" value="1">Сброс</button>
+        </div>
+    </form>
+</div>
+
+{% if min_price or max_price %}
+<div class="results-info">
+    <strong>Результаты поиска:</strong><br>
+    {% if min_price %}От {{ min_price }} руб.{% endif %}
+    {% if max_price %}До {{ max_price }} руб.{% endif %}
+    {% if not min_price and not max_price %}Все товары{% endif %}
+</div>
+{% endif %}
+
+<div class="results-info">
+    <strong>Найдено товаров: {{ products|length }}</strong>
+</div>
+
+{% if products %}
+<div class="product-grid">
+    {% for product in products %}
+    <div class="product-card">
+        <div class="product-name">{{ product.name }}</div>
+        <div class="product-price">{{ product.price }} руб.</div>
+        <div class="product-details">
+            <strong>Бренд:</strong> {{ product.brand }}<br>
+            <strong>Цвет:</strong> {{ product.color }}<br>
+            <strong>Память:</strong> {{ product.storage }}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="no-results">
+    <h3>Не найдено ни одного товара</h3>
+    <p>Попробуйте изменить диапазон цен</p>
+</div>
+{% endif %}
+
+<div style="margin-top: 30px;">
+    <a href="/lab3/">Вернуться к лабораторной работе 3</a>
+</div>
+{% endblock %}
