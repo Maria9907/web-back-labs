@@ -40,11 +40,8 @@ def form1():
 
     sex = request.args.get('sex')
 
+    return render_template('lab3/form1.html', user=user, age=age, sex=sex, errors=errors)
     
-    if errors:
-        return render_template('lab3/form1.html', user=user, age=age, sex=sex, errors=errors)
-    else:
-        return render_template('lab3/form1.html', user=user, age=age, sex=sex, errors=errors)
 
 @lab3.route('/lab3/order')
 def order():
@@ -208,7 +205,7 @@ def ticket():
 
 
 
-# Список товаров
+
 products = [
     {"name": "iPhone 15", "price": 89990, "brand": "Apple", "color": "черный", "storage": "128GB"},
     {"name": "Samsung Galaxy S24", "price": 74990, "brand": "Samsung", "color": "белый", "storage": "256GB"},
@@ -237,64 +234,59 @@ products = [
 
 @lab3.route('/lab3/search')
 def search():
-    # Получаем параметры из запроса
     min_price = request.args.get('min_price', '')
     max_price = request.args.get('max_price', '')
     reset = request.args.get('reset')
     
-    # Обработка кнопки "сброс"
+    
     if reset:
         resp = make_response(redirect('/lab3/search'))
         resp.delete_cookie('min_price')
         resp.delete_cookie('max_price')
         return resp
     
-    # Получаем цены из куки, если нет в запросе
+   
     if not min_price:
         min_price = request.cookies.get('min_price', '')
     if not max_price:
         max_price = request.cookies.get('max_price', '')
     
-    # Вычисляем минимальную и максимальную цены из всех товаров для плейсхолдеров
+   
     all_prices = [product['price'] for product in products]
     global_min_price = min(all_prices)
     global_max_price = max(all_prices)
     
-    # Фильтрация товаров
+    
     filtered_products = products
     
     if min_price or max_price:
-        try:
-            min_val = float(min_price) if min_price else global_min_price
-            max_val = float(max_price) if max_price else global_max_price
-            
-            # Если пользователь перепутал min и max - меняем местами
-            if min_val > max_val:
-                min_price, max_price = str(min_val), str(max_val)
-                min_price, max_price = str(max_val), str(min_val)
-            
-            filtered_products = [
-                product for product in products
-                if min_val <= product['price'] <= max_val
-            ]
-            
-            # Сохраняем в куки
-            resp = make_response(render_template('lab3/search.html',
-                                               products=filtered_products,
-                                               min_price=min_price,
-                                               max_price=max_price,
-                                               global_min_price=global_min_price,
-                                               global_max_price=global_max_price))
-            if min_price:
-                resp.set_cookie('min_price', min_price)
-            if max_price:
-                resp.set_cookie('max_price', max_price)
-            return resp
-            
-        except ValueError:
-            # Если введены не числа - игнорируем фильтрацию
-            pass
-    
+        
+        min_val = float(min_price) if min_price else global_min_price
+        max_val = float(max_price) if max_price else global_max_price
+        
+        
+        if min_val > max_val:
+            min_val, max_val = max_val, min_val  
+            min_price, max_price = str(min_val), str(max_val)  
+        filtered_products = [
+            product for product in products
+            if min_val <= product['price'] <= max_val
+        ]
+        
+        
+        resp = make_response(render_template('lab3/search.html',
+                                            products=filtered_products,
+                                            min_price=min_price,
+                                            max_price=max_price,
+                                            global_min_price=global_min_price,
+                                            global_max_price=global_max_price))
+        if min_price:
+            resp.set_cookie('min_price', min_price)
+        if max_price:
+            resp.set_cookie('max_price', max_price)
+        return resp
+        
+        
     return render_template('lab3/search.html',
                          products=filtered_products,
                          min_price=min_price,
