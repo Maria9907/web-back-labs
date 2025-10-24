@@ -119,3 +119,27 @@ def tree():
             tree_count += 1
 
     return redirect('/lab4/tree')
+
+
+users = [
+    {'login': 'alex', 'password': '123'},
+    {'login': 'maria', 'password': '890'},
+    {'login': 'tema', 'password': 'zxc'},
+    {'login': 'Маша', 'password': 'qwerty'},
+]
+
+@lab4.route('/lab4/login', methods = ['GET','POST'])
+def login():
+    if request.method == 'GET':
+        return render_template("lab4/login.html", authorized=False)
+    
+    login = request.form.get('login')
+    password = request.form.get('password')
+
+    for user in users:
+        if login == user['login'] and password == user['password']:
+            return render_template('/lab4/login.html',login=login, authorized=True)
+        
+    error = 'Неверные логин и/или пароль'
+    return render_template('/lab4/login.html', error=error, authorized=False)
+
