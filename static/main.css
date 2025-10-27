@@ -1,6 +1,7 @@
 body {
     margin: 0;
     font-family: monospace;
+    font-size: 16px;
     
 }
 main {
@@ -39,8 +40,14 @@ th, td {
     border-right: 1px solid #ddd; 
 }
 
+.cpisok {
+    font-weight: bold;
+    color: #000;
 
-
+}
+h1,h2 {
+    margin: 4px;
+}
   
 #h11 {
     text-align: center;
@@ -91,7 +98,6 @@ th, td {
 
 .error {
     color: red;
-    
 }
 .success-message {
     background-color: #d4edda;
@@ -102,15 +108,19 @@ th, td {
     color: #155724;
 }
 
-
+form h1 {
+    text-align: center;
+}
 
 form {
         max-width: 400px;
         margin: 20px auto;
         padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        background-color: #f9f9f9;
+        border: 2.5px solid #e6bbbb;
+        border-radius: 8px;
+        background-color: #a17676;
+        font-size: 15px;
+        box-shadow: 0 0px 10px 0 rgb(95, 53, 59);
     }
 
     label {
@@ -121,10 +131,12 @@ form {
 
     input[type="text"],
     input[type="number"],
+    input[type="password"],
     select {
         width: 100%;
         padding: 8px;
         margin-bottom: 15px;
+        margin-top: 5px;
         border: 1px solid #ccc;
         border-radius: 4px;
         box-sizing: border-box;
@@ -136,21 +148,25 @@ form {
     }
 
     button {
-        background-color: #4CAF50;
-        color: white;
+        background-color: lightpink;
+        color: rgb(0, 0, 0);
         padding: 10px 15px;
         border: none;
         border-radius: 4px;
         cursor: pointer;
+        font-weight: bold;
     }
 
     button:hover {
-        background-color: #45a049;
+        background-color: rgb(247, 158, 171);
     }
 
     .error {
-        color: red;
-        font-size: 0.9em;
+        color: rgb(235, 174, 174);
+        font-weight: bold;
+        font-size: 20px;
+        margin-bottom: 10px;
+        
     }
     #success {
         text-align: center;
@@ -214,3 +230,25 @@ form {
         color: #7f8c8d;
         font-style: italic;
     }
+
+
+    .arithmetic {
+        font-size: 25px;
+        text-align: center;
+        font-weight: bold;
+    }
+.equal {
+    font-size: 24px;  
+    display: block;
+    margin: 0 auto;
+    width: 90px;              
+    height: 30px; 
+    background-color: lightpink;
+    border-radius: 4px;
+    border: none;
+    font-weight: bold;
+     cursor: pointer;
+}
+.equal:hover {
+    background-color: rgb(247, 158, 171); /* Темнее при наведении */
+}

@@ -6,8 +6,8 @@
 {# основной контент: #}
 {% block main %}
     <form method="post" action="/lab4/div">
-        <h1>деление чисел</h1>
-        <input type="number" name="x1"> / <input type="number" name="x2">
-        <input type="submit" value="=">
+        <h1>Деление чисел</h1>
+        <input type="number" name="x1"> <div class="arithmetic">/</div> <input type="number" name="x2">
+        <input  class="equal" type="submit" value="=">
     </form>
 {% endblock %}
