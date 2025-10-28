@@ -162,10 +162,14 @@ form {
     }
 
     .error {
-        color: rgb(235, 174, 174);
+        color: rgb(247, 158, 171);
         font-weight: bold;
         font-size: 20px;
         margin-bottom: 10px;
+        margin-top: 10px;
+        background-color: #ffffff;
+        text-align: center;
+        border-radius: 5px;
         
     }
     #success {
@@ -176,7 +180,7 @@ form {
     }
 
     .price {
-        color: #3a5067;
+        color: rgb(247, 158, 171);
         font-weight: bold;
     }
     
@@ -270,4 +274,11 @@ form {
     color: #1e90ff;
     font-size: 30px;
     text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+
+.grain {
+    text-align: center;
+    margin-top: 20px;
+    background-color: lightpink;
 }

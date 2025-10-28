@@ -212,3 +212,64 @@ def fridge():
                              snowflakes=snowflakes,
                              temperature=temperature)
 
+
+
+
+
+@lab4.route('/lab4/grain', methods=['GET', 'POST'])
+def grain():
+    if request.method == 'GET':
+        return render_template('lab4/grain.html')
+    
+    grain = request.form.get('grain')  
+    weight_str = request.form.get('weight')
+    
+    
+    prices = {
+        'barley': 12000,  # ячмень
+        'oats': 8500,     # овёс
+        'wheat': 9000,    # пшеница
+        'rye': 15000      # рожь
+    }
+    
+    grain_names = {
+        'barley': 'ячмень',
+        'oats': 'овёс', 
+        'wheat': 'пшеница',
+        'rye': 'рожь'
+    }
+    
+    error = None
+    message = None
+    discount_info = None
+
+    if not grain:
+        error = 'Ошибка: вы забыли указать зерно'
+    elif not weight_str or weight_str.strip() == '':
+        error = 'Ошибка: не указан вес'
+    else:
+        weight = int(weight_str)
+        if weight <= 0:
+            error = 'Ошибка: вес должен быть положительным числом'
+        elif weight > 100:
+            error = 'Такого объёма сейчас нет в наличии'
+        elif weight > 10:
+            # Расчет с скидкой 10%
+            base_price = prices[grain]
+            total = weight * base_price
+            discount = total * 0.1
+            final_price = total - discount
+            discount_info = f'Применена скидка 10% за большой объём. Размер скидки: {discount:.0f} руб.'
+            message = f'Заказ успешно сформирован. Вы заказали {grain_names[grain]}. Вес: {weight} т. Сумма к оплате: {final_price:.0f} руб.'
+        else:
+            base_price = prices[grain]
+            total = weight * base_price
+            message = f'Заказ успешно сформирован. Вы заказали {grain_names[grain]}. Вес: {weight} т. Сумма к оплате: {total:.0f} руб.'
+        
+    return render_template('lab4/grain.html', 
+                         error=error, 
+                         message=message, 
+                         discount_info=discount_info,
+                         selected_grain=grain, 
+                         weight=weight_str if weight_str else ''
+                        )

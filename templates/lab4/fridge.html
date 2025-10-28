@@ -18,10 +18,8 @@
                     <div class="error">{{ error }}</div>
                 {% endif %}
             </div>
-        </form>
 
-
-        {% if message %}
+            {% if message %}
             <div class="success">
                 <span>{{ message }}</span>
                 <div class="snowflakes-inline">
@@ -31,6 +29,10 @@
                 </div>
             </div>
         {% endif %}
+        </form>
+
+
+        
 {% endblock %}
 
 

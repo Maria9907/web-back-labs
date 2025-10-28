@@ -1,0 +1,65 @@
+{% extends "base.html" %} 
+
+{# номер лабораторной работы: #}
+{% block lab %}Лабораторная работа 4{% endblock %}
+
+{# основной контент: #}
+{% block main %}
+    <h1 style="text-align: center;">Заказ зерна</h1>
+
+    <form method="post">
+        <div>
+            <label>Выберите зерно:</label>
+            <label>
+                <input type="radio" value="barley" name="grain" {{ 'checked' if selected_grain == 'barley' }}>Ячмень
+                <span  class="price"> - 12 000 руб./т.</span>
+            </label>
+            
+            <label>
+                <input type="radio" value="oats" name="grain" {{ 'checked' if selected_grain == 'oats' }}>Овёс
+                <span  class="price"> - 8 500 руб./т.</span>
+            </label>
+            <label>
+                <input type="radio" value="wheat" name="grain"{ 'checked' if selected_grain == 'wheat' }} >Пшеница
+                <span  class="price"> - 9 000 руб./т.</span>
+            </label>
+            <label>
+                <input type="radio" value="rye" name="grain" {{ 'checked' if selected_grain == 'rye' }}>Рожь
+                <span  class="price"> - 15 000 руб./т.</span>
+            </label>
+        </div>
+
+         <div >
+            <label for="weight">Вес (тонны):</label>
+            <input type="number" id="weight" name="weight" value="{{ weight }}" placeholder="Введите вес в тоннах">
+        </div>
+
+
+        <div>
+            <button type="submit">Заказать</button>
+        </div>
+        {% if error %}
+                    <div class="error">{{ error }}</div>
+        {% endif %}
+
+        {% if message %}
+            <div class="success">
+                {{ message }}
+                {% if discount_info %}
+                    <div class="discount-info">{{ discount_info }}</div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </form>
+
+
+    <div class="grain"  >
+        <h3>Условия заказа:</h3>
+        <div>При заказе более 10 тонн - скидка 10%</div>
+        <div>Максимальный заказ - 100 тонн</div>
+        
+    </div>
+        
+
+
+{% endblock %}
