@@ -9,8 +9,9 @@
     {% if authorized %}
         <h1>Добро пожаловать, {% if gender == 'м' %}уважаемый{% else %}уважаемая{% endif %} {{ name }}!</h1>
         <div>
-            <form action="/lab4/logout" method="post">
-                <button>Выход</button>
+            <p><a href="/lab4/users">Список пользователей</a></p>
+            <form action="/lab4/logout" method="post" style="text-align: center;">
+                <button >Выход</button>
             </form>
         </div>
     {% else %}
@@ -31,5 +32,8 @@
                 <button type="reset  ">Отмена</button>
             </div>
         </form>
+        <div style="margin-top: 20px; text-align: center">
+            <a href="/lab4/register">Нет аккаунта? Зарегистрируйтесь</a>
+        </div>
     {% endif %}
 {% endblock %}
