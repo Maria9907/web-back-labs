@@ -249,6 +249,7 @@ def edit_user():
     current_user['name'] = new_name
     current_user['gender'] = new_gender
     
+    # Обновление пароля только если введен новый
     if new_password:
         current_user['password'] = new_password
     
@@ -300,14 +301,12 @@ def login():
     error = 'Неверные логин и/или пароль'
     return render_template('/lab4/login.html', error=error, authorized=False, login=login)
 
-
-
-
-
 @lab4.route('/lab4/logout', methods = ['POST'])
 def logout():
     session.pop('login', None)
     return redirect('/lab4/login')
+
+
 
 @lab4.route('/lab4/fridge', methods = ['GET','POST'])
 def fridge():
