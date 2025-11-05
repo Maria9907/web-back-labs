@@ -1,5 +1,5 @@
 from flask import Blueprint, redirect, url_for, abort, session, make_response, request, render_template
-
+import psycopg2
 lab5 = Blueprint('lab5',__name__)
 
 @lab5.route('/lab5/')
@@ -17,5 +17,27 @@ def register():
     if not (login and password):
         return render_template('lab5/register.html', error='Заполните все поля')
 
+    conn = psycopg2.connect(
+        host = '127.0.0.1',
+        database = 'maria_matyushkina_knowledge_base',
+        user = 'maria_matyushkina_knowledge_base',
+        password = '123'
+    )
+    cur = conn.cursor()
+
+    cur.execute(f"SELECT login FROM users WHERE login='{login}';")
+    if cur.fetchone():
+
+        cur.close()
+        conn.close()
+        return render_template('lab5/register.html',
+                               error="Такой пользователь уже существует")
+    cur.execute(f"INSERT INTO users (login, password) VALUES ('{login}', '{password}');")
+    conn.commit()
+    cur.close()
+    conn.close()
+    return render_template('lab5/success.html', login=login)
 
 
+
+   
