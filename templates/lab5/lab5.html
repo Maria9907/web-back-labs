@@ -20,10 +20,14 @@
         <li>
             <a href="/lab5/create">Создать статью</a>
         </li>
-        <span>{{ login or 'anonymous' }}</span>
-   
-        
-    
-    
     </ol>
+     <div >
+        <strong>
+            {% if login %}
+                Пользователь: {{ login }}
+            {% else %}
+                Пользователь: Anonymous
+            {% endif %}
+        </strong>
+    </div>
 {% endblock %}
