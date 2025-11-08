@@ -11,9 +11,10 @@ def lab():
 def db_connect():
     conn = psycopg2.connect(
         host = '127.0.0.1',
-        database = 'maria_matyushkina_knowledge_base',
-        user = 'maria_matyushkina_knowledge_base',
-        password = '123'
+        database = 'maria_matyushkina_knowledge_base_2',
+        user = 'maria_matyushkina_knowledge_base_2',
+        password = '123',
+        client_encoding='utf8'
     )
     cur = conn.cursor(cursor_factory= RealDictCursor)
     
@@ -80,5 +81,27 @@ def login():
     db_close(conn, cur)
     return render_template('lab5/success_login.html', login=login)
 
+@lab5.route('/lab5/create', methods = ['GET', 'POST'])
+def create():
+    login=session.get('login')
+    if not login:
+        return redirect('/lab5/login')
+    
+    if request.method == 'GET':
+        return render_template('lab5/create_article.html')
+    
+    title = request.form.get('title')
+    article_text = request.form.get('article_text')
 
+    conn, cur = db_connect()
+
+    cur.execute("SELECT * FROM users WHERE login=%s;", (login,))
+    login_id = cur.fetchone()["id"]
+
+
+    cur.execute(f"INSERT INTO articles(login_id, title, article_text) \
+                VALUES ({login_id}, '{title}', '{article_text}');")
+    
+    db_close(conn, cur)
+    return redirect('/lab5')
    
