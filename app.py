@@ -5,7 +5,7 @@ from flask import (
     redirect,
     make_response,
     abort,
-    render_template, os
+    render_template,
 )
 import datetime
 from lab1 import lab1
