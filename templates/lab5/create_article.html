@@ -9,16 +9,18 @@
         <div>
             <label>
                 Название статьи:
-                <input type="text" maxlength="50" name="title">
+                <input type="text" maxlength="50" name="title" required>
             </label>
         </div>
 
         <div>
-            <textarea name="article_text"></textarea>
+            Текст статьи:
+            <textarea name="article_text" rows="10" style="width: 100%;" required></textarea>
         </div>
 
         <div>
-            <button type="submit">Готово</button>
+            <button type="submit">Создать статью</button>
+            <a href="/lab5/list" style="margin-left: 10px;">Отмена</a>
         </div>
     </form>
 {% endblock %}
