@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 5{% endblock %}
+
+{% block main %}
+    <h1>Редактирование профиля</h1>
+
+    {% if errors %}
+        
+    {% endif %}
+
+    <form method="post">
+        <div>
+            <label>
+                Логин: <strong>{{ user['login'] }}</strong>
+            </label>
+        </div>
+
+        <div>
+            <label>
+                Полное имя:
+                <input type="text" name="full_name" value="{{ user['full_name'] or '' }}" style="width: 300px;">
+            </label>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <h3>Смена пароля</h3>
+            <div>
+                <label>
+                    Текущий пароль:
+                    <input type="password" name="current_password">
+                </label>
+            </div>
+
+            <div>
+                <label>
+                    Новый пароль:
+                    <input type="password" name="new_password">
+                </label>
+            </div>
+
+            <div>
+                <label>
+                    Подтверждение нового пароля:
+                    <input type="password" name="confirm_password">
+                </label>
+            </div>
+            <small>Оставьте поля пароля пустыми, если не хотите менять пароль</small>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <button type="submit">Сохранить изменения</button>
+            <a href="/lab5/" style="margin-left: 10px;">Отмена</a>
+        </div>
+
+        <div>
+            {% for error in errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    </form>
+{% endblock %}

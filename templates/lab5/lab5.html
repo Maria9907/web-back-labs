@@ -16,11 +16,14 @@
     </div>
 
     
-    <nav style="margin-bottom: 20px;">
-        <a href="/lab5/list" style="margin-right: 15px;">Список статей</a>
-        <a href="/lab5/create" style="margin-right: 15px;">Создать статью</a>
+     <nav style="margin-bottom: 20px;">
+        <a href="/lab5/public" style="margin-right: 15px;">Публичные статьи</a>
         
         {% if login %}
+            <a href="/lab5/list" style="margin-right: 15px;">Мои статьи</a>
+            <a href="/lab5/create" style="margin-right: 15px;">Создать статью</a>
+            <a href="/lab5/users" style="margin-right: 15px;">Список пользователей</a>
+            <a href="/lab5/profile" style="margin-right: 15px;">Профиль</a>
             <a href="/lab5/logout" style="margin-right: 15px;">Выйти</a>
             <span>Пользователь: {{ login }}</span>
         {% else %}

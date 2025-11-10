@@ -7,12 +7,14 @@ def create_tables():
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
     
-    
+    cur.execute('DROP TABLE IF EXISTS articles;')
+    cur.execute('DROP TABLE IF EXISTS users;')
     cur.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             login VARCHAR(30) UNIQUE NOT NULL,
-            password VARCHAR(162) NOT NULL
+            password VARCHAR(162) NOT NULL,
+            full_name VARCHAR(100)
         )
     ''')
     

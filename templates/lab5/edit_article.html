@@ -22,6 +22,20 @@
         </div>
 
         <div>
+            <label>
+                <input type="checkbox" name="is_favorite" {% if article['is_favorite'] %}checked{% endif %}>
+                Добавить в избранное
+            </label>
+        </div>
+
+        <div>
+            <label>
+                <input type="checkbox" name="is_public" {% if article['is_public'] %}checked{% endif %}>
+                Сделать публичной
+            </label>
+        </div>
+
+        <div>
             <button type="submit">Сохранить изменения</button>
             <a href="/lab5/list" style="margin-left: 10px;">Отмена</a>
         </div>
