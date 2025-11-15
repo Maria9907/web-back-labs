@@ -11,18 +11,18 @@
         {% for article in articles %}
              <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 5px; {% if article['is_favorite'] %}background-color: #fffacd;{% endif %}">
                 {% if article['is_favorite'] %}
-                    <span style="color: gold; font-weight: bold;">★ </span>
+                    <span style="color: rgb(234, 217, 118); font-weight: bold;">★ </span>
                 {% endif %}
                 <h2>{{ article['title'] }}</h2>
                 <blockquote>{{ article['article_text'] }}</blockquote>
                 <div>
                     {% if article['is_public'] %}
-                        <span style="color: green; margin-right: 10px;">✓ Публичная</span>
+                        <span style="color: rgb(113, 212, 113); margin-right: 10px;">✓ Публичная</span>
                     {% else %}
-                        <span style="color: gray; margin-right: 10px;">✗ Приватная</span>
+                        <span style="color: rgb(107, 99, 99); margin-right: 10px;">✗ Приватная</span>
                     {% endif %}
-                    <a href="/lab5/edit/{{ article['id'] }}" style="color: blue; margin-right: 10px;">Редактировать</a>
-                    <a href="/lab5/delete/{{ article['id'] }}" style="color: red;" 
+                    <a href="/lab5/edit/{{ article['id'] }}" style="color: rgb(163, 163, 241); margin-right: 10px;">Редактировать</a>
+                    <a href="/lab5/delete/{{ article['id'] }}" style="color: rgb(239, 107, 107);" 
                        onclick="return confirm('Вы уверены, что хотите удалить эту статью?')">Удалить</a>
                 </div>
             </div>

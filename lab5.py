@@ -21,6 +21,7 @@ def db_connect():
         )
         cur = conn.cursor(cursor_factory= RealDictCursor)
     else:
+        # Подключение к SQLite
         dir_path = path.dirname(path.realpath(__file__))
         db_path = path.join(dir_path, "database.db")
         conn = sqlite3.connect(db_path)
@@ -53,18 +54,18 @@ def register():
 
     conn, cur = db_connect()
 
+    # Проверяем, не существует ли уже пользователь с таким логином
     if current_app.config['DB_TYPE'] == 'postgres':
         cur.execute("SELECT login FROM users WHERE login=%s;", (login,))
     else:
         cur.execute("SELECT login FROM users WHERE login=?;", (login,))
 
-
-        
     if cur.fetchone():
         db_close(conn, cur)
         return render_template('lab5/register.html',
                                error="Такой пользователь уже существует")
     
+    # Хэшируем пароль и создаем нового пользователя
     password_hash = generate_password_hash(password)
     if current_app.config['DB_TYPE'] == 'postgres':
         cur.execute("INSERT INTO users (login, password, full_name) VALUES (%s, %s, %s);", (login, password_hash, full_name))
@@ -73,6 +74,7 @@ def register():
     db_close(conn, cur)
     return render_template('lab5/success.html', login=login)
 
+# Авторизация пользователя
 @lab5.route('/lab5/login', methods = ['GET', 'POST'])
 def login():
     if request.method == 'GET':
@@ -85,7 +87,7 @@ def login():
     
     conn, cur = db_connect()
 
-
+    # Ищем пользователя в базе данных
     if current_app.config['DB_TYPE'] == 'postgres':
         cur.execute("SELECT * FROM users WHERE login=%s", (login,))
     else:
@@ -108,6 +110,7 @@ def login():
     db_close(conn, cur)
     return render_template('lab5/success_login.html', login=login)
 
+# Создание новой статьи
 @lab5.route('/lab5/create', methods = ['GET', 'POST'])
 def create():
     login=session.get('login')
@@ -138,7 +141,7 @@ def create():
         login_id = cur.fetchone()["id"]
 
     
-
+    # Создаем новую статью
     if current_app.config['DB_TYPE'] == 'postgres':
         cur.execute("""
             INSERT INTO articles(login_id, title, article_text, is_favorite, is_public) 
@@ -153,6 +156,7 @@ def create():
     db_close(conn, cur)
     return redirect('/lab5/list')
 
+# Просмотр списка статей пользователя
 @lab5.route('/lab5/list')
 def list_articles():
     login = session.get('login')
@@ -161,28 +165,27 @@ def list_articles():
     
     conn, cur = db_connect()
 
-    try:
-        cur.execute("SELECT id FROM users WHERE login=?;", (login,))
-        user = cur.fetchone()
-        
-        if not user:
-            db_close(conn, cur)
-            return redirect('/lab5/login')
-        
-        login_id = user["id"]
 
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("SELECT * FROM articles WHERE login_id=%s ORDER BY is_favorite DESC, id DESC;", (login_id,))
-        else:
-            cur.execute("SELECT * FROM articles WHERE login_id=? ORDER BY is_favorite DESC, id DESC;", (login_id,))
-        articles = cur.fetchall()
-
-        db_close(conn, cur)
-        return render_template('lab5/articles.html', articles=articles, login=login)
-    except Exception as e:
-        db_close(conn, cur)
-        return render_template('lab5/articles.html', articles=[], error=f'Ошибка загрузки статей: {e}')
+    cur.execute("SELECT id FROM users WHERE login=?;", (login,))
+    user = cur.fetchone()
     
+    if not user:
+        db_close(conn, cur)
+        return redirect('/lab5/login')
+    
+    login_id = user["id"]
+
+    # Получаем статьи пользователя, отсортированные по избранным и дате
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("SELECT * FROM articles WHERE login_id=%s ORDER BY is_favorite DESC, id DESC;", (login_id,))
+    else:
+        cur.execute("SELECT * FROM articles WHERE login_id=? ORDER BY is_favorite DESC, id DESC;", (login_id,))
+    articles = cur.fetchall()
+
+    db_close(conn, cur)
+    return render_template('lab5/articles.html', articles=articles, login=login)
+
+# Редактирование статьи
 @lab5.route('/lab5/edit/<int:article_id>', methods=['GET', 'POST'])
 def edit_article(article_id):
     login = session.get('login')
@@ -237,8 +240,7 @@ def edit_article(article_id):
     db_close(conn, cur)
     return redirect('/lab5/list')
 
-
-
+# Удаление статьи
 @lab5.route('/lab5/delete/<int:article_id>')
 def delete_article(article_id):
     login = session.get('login')
@@ -247,7 +249,7 @@ def delete_article(article_id):
     
     conn, cur = db_connect()
 
-    
+    # Получаем статью для проверки прав доступа
     if current_app.config['DB_TYPE'] == 'postgres':
         cur.execute("SELECT a.*, u.login FROM articles a JOIN users u ON a.login_id = u.id WHERE a.id=%s;", (article_id,))
     else:
@@ -271,8 +273,9 @@ def delete_article(article_id):
         cur.execute("DELETE FROM articles WHERE id=?;", (article_id,))
     
     db_close(conn, cur)
-    return redirect('/lab5/list') 
+    return redirect('/lab5/list')
 
+# Профиль пользователя
 @lab5.route('/lab5/profile', methods=['GET', 'POST'])
 def profile():
     login = session.get('login')
@@ -320,6 +323,7 @@ def profile():
         db_close(conn, cur)
         return render_template('lab5/profile.html', user=user, errors=errors)
     
+    # Обновляем данные пользователя
     if new_password:
         password_hash = generate_password_hash(new_password)
         if current_app.config['DB_TYPE'] == 'postgres':
@@ -337,6 +341,7 @@ def profile():
     db_close(conn, cur)
     return redirect('/lab5/')
 
+# Список всех пользователей
 @lab5.route('/lab5/users')
 def users_list():
     login = session.get('login')
@@ -344,7 +349,8 @@ def users_list():
         return redirect('/lab5/login')
     
     conn, cur = db_connect()
-    
+
+    # Получаем список всех пользователей
     if current_app.config['DB_TYPE'] == 'postgres':
         cur.execute("SELECT login, full_name FROM users ORDER BY login;")
     else:
@@ -355,31 +361,30 @@ def users_list():
     
     return render_template('lab5/users.html', users=users)
 
+# Просмотр публичных статей
 @lab5.route('/lab5/public')
 def public_articles():
     conn, cur = db_connect()
-
-    try:
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("""
-                SELECT a.*, u.login, u.full_name 
-                FROM articles a 
-                JOIN users u ON a.login_id = u.id 
-                WHERE a.is_public = TRUE 
-                ORDER BY a.is_favorite DESC, a.id DESC;
-            """)
-        else:
-            cur.execute("""
-                SELECT a.*, u.login, u.full_name 
-                FROM articles a 
-                JOIN users u ON a.login_id = u.id 
-                WHERE a.is_public = 1 
-                ORDER BY a.is_favorite DESC, a.id DESC;
-            """)
-        articles = cur.fetchall()
-        
-        db_close(conn, cur)
-        return render_template('lab5/public_articles.html', articles=articles, login=session.get('login'))
-    except Exception as e:
-        db_close(conn, cur)
-        return render_template('lab5/public_articles.html', articles=[], error=f'Ошибка загрузки статей: {e}')
+    
+    # Получаем все публичные статьи с информацией об авторах
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("""
+            SELECT a.*, u.login, u.full_name 
+            FROM articles a 
+            JOIN users u ON a.login_id = u.id 
+            WHERE a.is_public = TRUE 
+            ORDER BY a.is_favorite DESC, a.id DESC;
+        """)
+    else:
+        cur.execute("""
+            SELECT a.*, u.login, u.full_name 
+            FROM articles a 
+            JOIN users u ON a.login_id = u.id 
+            WHERE a.is_public = 1 
+            ORDER BY a.is_favorite DESC, a.id DESC;
+        """)
+    articles = cur.fetchall()
+    
+    db_close(conn, cur)
+    return render_template('lab5/public_articles.html', articles=articles, login=session.get('login'))
+    

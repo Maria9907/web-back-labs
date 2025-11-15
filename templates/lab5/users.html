@@ -7,16 +7,16 @@
 
     <table style="width: 100%; border-collapse: collapse;">
         <thead>
-            <tr style="background-color: #f2f2f2;">
-                <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Логин</th>
-                <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Полное имя</th>
+            <tr >
+                <th>Логин</th>
+                <th>Полное имя</th>
             </tr>
         </thead>
         <tbody>
             {% for user in users %}
                 <tr>
-                    <td style="padding: 10px; border: 1px solid #ddd;">{{ user['login'] }}</td>
-                    <td style="padding: 10px; border: 1px solid #ddd;">{{ user['full_name'] or 'Не указано' }}</td>
+                    <td >{{ user['login'] }}</td>
+                    <td >{{ user['full_name'] or 'Не указано' }}</td>
                 </tr>
             {% endfor %}
         </tbody>

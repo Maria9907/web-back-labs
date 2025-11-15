@@ -1,7 +1,7 @@
 {% extends "base.html" %} 
 
 {# номер лабораторной работы: #}
-{% block lab %}Лабораторная работа 4{% endblock %}
+{% block lab %}Лабораторная работа 5{% endblock %}
 
 {# основной контент: #}
 {% block main %}
@@ -16,19 +16,20 @@
     </div>
 
     
-     <nav style="margin-bottom: 20px;">
-        <a href="/lab5/public" style="margin-right: 15px;">Публичные статьи</a>
+     <nav class="nav-panel" style="margin-bottom: 20px;">
+        <a href="/lab5/public" class="nav-button">Публичные статьи</a>
         
         {% if login %}
-            <a href="/lab5/list" style="margin-right: 15px;">Мои статьи</a>
-            <a href="/lab5/create" style="margin-right: 15px;">Создать статью</a>
-            <a href="/lab5/users" style="margin-right: 15px;">Список пользователей</a>
-            <a href="/lab5/profile" style="margin-right: 15px;">Профиль</a>
-            <a href="/lab5/logout" style="margin-right: 15px;">Выйти</a>
-            <span>Пользователь: {{ login }}</span>
+            <a href="/lab5/list" class="nav-button">Мои статьи</a>
+            <a href="/lab5/create" class="nav-button">Создать статью</a>
+            <a href="/lab5/users" class="nav-button">Список пользователей</a>
+            <a href="/lab5/profile" class="nav-button">Профиль</a>
+            <a href="/lab5/logout" class="nav-button logout">Выйти</a>
+            <span class="user-info">Пользователь: {{ login }}</span>
         {% else %}
-            <a href="/lab5/login" style="margin-right: 15px;">Войти</a>
-            <a href="/lab5/register">Регистрация</a>
+            <a href="/lab5/login" class="nav-button">Войти</a>
+            <a href="/lab5/register" class="nav-button">Регистрация</a>
         {% endif %}
     </nav>
+    
 {% endblock %}
