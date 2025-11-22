@@ -149,6 +149,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 {# основной контент: #}
 {% block main %}
+<style>
+    #office-list li {
+        display: flex;
+        align-items: center;
+        margin-top: 5px;
+    }
+    #office-list button {
+        margin-left: 15px; 
+    }
+</style>
     <h1>Список кабинетов</h1>
     <ul id="office-list"></ul>
     <div id="total-cost" style="margin-top: 20px; font-weight: bold;"></div>

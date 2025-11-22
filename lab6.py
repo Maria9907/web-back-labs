@@ -65,7 +65,6 @@ def api():
         office_number = data['params']
         for office in offices:
             if office['number'] == office_number:
-                # Проверяем, что офис арендован
                 if not office['tenant']:
                     return {
                         'jsonrpc': '2.0',
@@ -75,7 +74,6 @@ def api():
                         },
                         'id': id
                     }
-                # Проверяем, что офис арендован именно этим пользователем
                 if office['tenant'] != login:
                     return {
                         'jsonrpc': '2.0',
@@ -85,7 +83,6 @@ def api():
                         },
                         'id': id
                     }
-                # Снимаем аренду
                 office['tenant'] = ''
                 return {
                     'jsonrpc': '2.0',
