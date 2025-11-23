@@ -169,9 +169,18 @@ def api():
                     'id': id
                 }
             
-            # Проверяем, арендован ли офис
-            tenant = office['tenant'] if current_app.config['DB_TYPE'] == 'postgres' else office[1]
-            if not tenant:
+             # Получаем tenant для обеих БД
+            if current_app.config['DB_TYPE'] == 'postgres':
+                tenant = office['tenant']
+            else:
+                tenant = office['tenant']
+            
+            # Улучшенная проверка аренды офиса
+            is_occupied = tenant is not None and str(tenant).strip() != ''
+            
+            print(f"Офис {office_number}: tenant='{tenant}', login='{login}', is_occupied={is_occupied}")
+            
+            if not is_occupied:
                 return {
                     'jsonrpc': '2.0',
                     'error': {
@@ -181,8 +190,14 @@ def api():
                     'id': id
                 }
             
-            # Проверяем, что офис арендован текущим пользователем
-            if tenant != login:
+            # Улучшенная проверка, что офис арендован текущим пользователем
+            # Приводим оба значения к строке и сравниваем без учета пробелов
+            tenant_clean = str(tenant).strip() if tenant is not None else ""
+            login_clean = str(login).strip() if login is not None else ""
+            
+            print(f"Сравнение: tenant_clean='{tenant_clean}' vs login_clean='{login_clean}'")
+            
+            if tenant_clean != login_clean:
                 return {
                     'jsonrpc': '2.0',
                     'error': {
@@ -198,9 +213,21 @@ def api():
             else:
                 cur.execute("UPDATE offices SET tenant='' WHERE number=?;", (office_number,))
             
+            print(f"Офис {office_number} освобожден пользователем {login}")
+            
             return {
                 'jsonrpc': '2.0',
                 'result': 'success',
+                'id': id
+            }
+        except Exception as e:
+            print(f"Ошибка в методе cancellation: {e}")
+            return {
+                'jsonrpc': '2.0',
+                'error': {
+                    'code': -32000,
+                    'message': f'Database error: {str(e)}'
+                },
                 'id': id
             }
         finally:
