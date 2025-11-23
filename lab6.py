@@ -112,9 +112,18 @@ def api():
                     'id': id
                 }
             
-            # Проверяем, занят ли офис
-            tenant = office['tenant'] if current_app.config['DB_TYPE'] == 'postgres' else office[1]
-            if tenant:
+                # Улучшенная проверка занятости офиса
+            if current_app.config['DB_TYPE'] == 'postgres':
+                tenant = office['tenant']
+            else:
+                tenant = office['tenant']
+            
+            # Проверяем, что tenant не None и не пустая строка
+            is_occupied = tenant is not None and str(tenant).strip() != ''
+            
+            print(f"Офис {office_number}: tenant='{tenant}', is_occupied={is_occupied}")
+            
+            if is_occupied:
                 return {
                     'jsonrpc': '2.0',
                     'error': {
@@ -123,7 +132,6 @@ def api():
                     },
                     'id': id
                 }
-            
             # Бронируем офис
             if current_app.config['DB_TYPE'] == 'postgres':
                 cur.execute("UPDATE offices SET tenant=%s WHERE number=%s;", (login, office_number))
