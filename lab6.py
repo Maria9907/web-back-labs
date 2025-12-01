@@ -42,7 +42,8 @@ def main():
 def api():
     data = request.json
     id = data['id']
-    
+
+    # Метод получения информации об офисах
     if data['method'] == 'info':
         conn, cur = db_connect()
         
@@ -77,7 +78,8 @@ def api():
             }
         finally:
             db_close(conn, cur)
-    
+
+    # Проверка авторизации пользователя
     login = session.get('login')
     if not login:
         return {
@@ -89,6 +91,7 @@ def api():
             'id': id
         }
     
+    # Метод бронирования офиса
     if data['method'] == 'booking':
         office_number = data['params']
         conn, cur = db_connect()
@@ -112,13 +115,13 @@ def api():
                     'id': id
                 }
             
-                # Улучшенная проверка занятости офиса
+            
             if current_app.config['DB_TYPE'] == 'postgres':
                 tenant = office['tenant']
             else:
                 tenant = office['tenant']
             
-            # Проверяем, что tenant не None и не пустая строка
+            
             is_occupied = tenant is not None and str(tenant).strip() != ''
             
             print(f"Офис {office_number}: tenant='{tenant}', is_occupied={is_occupied}")
@@ -145,7 +148,8 @@ def api():
             }
         finally:
             db_close(conn, cur)
-    
+
+     # Метод отмены бронирования офиса
     if data['method'] == 'cancellation':
         office_number = data['params']
         conn, cur = db_connect()
@@ -169,13 +173,13 @@ def api():
                     'id': id
                 }
             
-             # Получаем tenant для обеих БД
+            # Получаем текущего арендатора офиса  
             if current_app.config['DB_TYPE'] == 'postgres':
                 tenant = office['tenant']
             else:
                 tenant = office['tenant']
             
-            # Улучшенная проверка аренды офиса
+           # Проверяем, занят ли офис
             is_occupied = tenant is not None and str(tenant).strip() != ''
             
             print(f"Офис {office_number}: tenant='{tenant}', login='{login}', is_occupied={is_occupied}")
@@ -190,8 +194,7 @@ def api():
                     'id': id
                 }
             
-            # Улучшенная проверка, что офис арендован текущим пользователем
-            # Приводим оба значения к строке и сравниваем без учета пробелов
+           
             tenant_clean = str(tenant).strip() if tenant is not None else ""
             login_clean = str(login).strip() if login is not None else ""
             
