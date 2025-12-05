@@ -9,13 +9,15 @@ function fillFilmList() {
             for (let i = 0; i < films.length; i++) {
                 let tr = document.createElement('tr');
 
-                let tdTitle = document.createElement('td');
+
                 let tdTitleRus = document.createElement('td');
+                let tdTitle = document.createElement('td');
                 let tdYear = document.createElement('td');
                 let tdActions = document.createElement('td');
 
-                tdTitle.innerText = films[i].title == films[i].title_ru ? '' : films[i].title;
+
                 tdTitleRus.innerText = films[i].title_ru;
+                tdTitle.innerText = films[i].title || films[i].title_ru;
                 tdYear.innerText = films[i].year;
 
                 let ediButton = document.createElement('button');
@@ -33,8 +35,8 @@ function fillFilmList() {
                 tdActions.append(ediButton);
                 tdActions.append(delButton);
 
-                tr.append(tdTitle);
                 tr.append(tdTitleRus);
+                tr.append(tdTitle);
                 tr.append(tdYear);
                 tr.append(tdActions);
 
@@ -77,6 +79,15 @@ function addFilm() {
 
     document.getElementById('description-error').innerText = '';
     showModal();
+
+    const titleRuInput = document.getElementById('title-ru');
+    const titleInput = document.getElementById('title');
+
+    titleRuInput.addEventListener('input', function () {
+        if (!titleInput.value.trim()) {
+            titleInput.value = this.value;
+        }
+    });
 }
 
 function sendFilm() {
@@ -103,11 +114,11 @@ function sendFilm() {
             }
             return resp.json();
         })
-        .then(function (errors ) {
+        .then(function (errors) {
             if (errors && errors.description)
                 document.getElementById('description-error').innerText = errors.description;
         })
-        .catch(function (error) {  
+        .catch(function (error) {
             console.error('Ошибка:', error);
         });
 }
@@ -126,7 +137,7 @@ function editFilm(id) {
             document.getElementById('description').value = film.description;
             showModal();
         })
-        .catch(function (error) {  
+        .catch(function (error) {
             console.error('Ошибка при загрузке фильма:', error);
         });
 }

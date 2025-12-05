@@ -73,6 +73,9 @@ def put_film(id):
     if not film.get('description') or film['description'].strip() == '':
         return {"description": "Описание не может быть пустым"}, 400
     
+    if (not film.get('title') or film['title'].strip() == '') and film.get('title_ru'):
+        film['title'] = film['title_ru']
+
     films[id] = film
     return films[id]
 
@@ -85,6 +88,9 @@ def add_films():
 
     if not film.get('description') or film['description'].strip() == '':
         return {"description": "Описание не может быть пустым"}, 400
+    
+    if (not film.get('title') or film['title'].strip() == '') and film.get('title_ru'):
+        film['title'] = film['title_ru']
     
     films.append(film)
     return {"id": len(films) - 1}, 201
