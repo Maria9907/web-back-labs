@@ -23,13 +23,13 @@ function fillFilmList() {
                 let ediButton = document.createElement('button');
                 ediButton.innerText = 'Редактировать';
                 ediButton.onclick = function () {
-                    editFilm(i);
+                    editFilm(films[i].id);
                 };
 
                 let delButton = document.createElement('button');
                 delButton.innerText = 'Удалить';
                 delButton.onclick = function () {
-                    deleteFilm(i, films[i].title_ru);
+                    deleteFilm(films[i].id, films[i].title_ru);
                 }
 
                 tdActions.append(ediButton);
@@ -153,7 +153,7 @@ function editFilm(id) {
             return data.json();
         })
         .then(function (film) {
-            document.getElementById('id').value = id;
+            document.getElementById('id').value = film.id;
             document.getElementById('title').value = film.title;
             document.getElementById('title-ru').value = film.title_ru;
             document.getElementById('year').value = film.year;
