@@ -69,6 +69,10 @@ def put_film(id):
     if id < 0 or id >= len(films):
         abort(404)
     film = request.get_json()
+    
+    if not film.get('description') or film['description'].strip() == '':
+        return {"description": "Описание не может быть пустым"}, 400
+    
     films[id] = film
     return films[id]
 
@@ -78,5 +82,9 @@ def add_films():
     film = request.get_json()
     if not film:
         abort(400, description="No data provided")
+
+    if not film.get('description') or film['description'].strip() == '':
+        return {"description": "Описание не может быть пустым"}, 400
+    
     films.append(film)
     return {"id": len(films) - 1}, 201
