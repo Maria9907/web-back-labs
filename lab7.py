@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, abort, jsonify
-
+from datetime import datetime
 
 lab7 = Blueprint('lab7', __name__)
 
@@ -47,6 +47,29 @@ films = [
     },
 ]
 
+def validate_film(film):
+    errors = {}
+    
+    if not film.get('title_ru') or film['title_ru'].strip() == '':
+        errors['title_ru'] = 'Русское название не может быть пустым'
+    
+    current_year = datetime.now().year
+    try:
+        year = int(film.get('year', 0))
+        if year < 1895 or year > current_year:
+            errors['year'] = f'Год должен быть в диапазоне от 1895 до {current_year}'
+    except (ValueError, TypeError):
+        errors['year'] = 'Год должен быть числом'
+    
+    description = film.get('description', '').strip()
+    if not description:
+        errors['description'] = 'Описание не может быть пустым'
+    elif len(description) > 2000:
+        errors['description'] = 'Описание не может превышать 2000 символов'
+    
+    return errors
+
+
 @lab7.route('/lab7/rest-api/films/', methods=['GET'])
 def get_films():
     return jsonify(films)
@@ -69,9 +92,13 @@ def put_film(id):
     if id < 0 or id >= len(films):
         abort(404)
     film = request.get_json()
-
+    
     if not film.get('description') or film['description'].strip() == '':
         return {"description": "Описание не может быть пустым"}, 400
+    
+    errors = validate_film(film)
+    if errors:
+        return jsonify(errors), 400
     
     if (not film.get('title') or film['title'].strip() == '') and film.get('title_ru'):
         film['title'] = film['title_ru']
@@ -88,6 +115,10 @@ def add_films():
 
     if not film.get('description') or film['description'].strip() == '':
         return {"description": "Описание не может быть пустым"}, 400
+    
+    errors = validate_film(film)
+    if errors:
+        return jsonify(errors), 400
     
     if (not film.get('title') or film['title'].strip() == '') and film.get('title_ru'):
         film['title'] = film['title_ru']
