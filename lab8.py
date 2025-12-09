@@ -208,9 +208,7 @@ def article_list():
     query = request.args.get('query', '').strip().lower()
     
     
-    base_query = articles.query.filter(
-        (articles.is_public == True) | (articles.login_id == current_user.id)
-    )
+    base_query = articles.query.filter_by(login_id=current_user.id)
     
     if query:
         articles_list = []
