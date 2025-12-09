@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, abort, jsonify, current_app, redirect
+from flask import Blueprint, render_template, request, abort, jsonify, current_app, redirect,session
 from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
 import psycopg2
@@ -7,6 +7,7 @@ import sqlite3
 from os import path
 from db import db
 from db.models import users,articles
+from flask_login import login_user, login_required, current_user
 lab8 = Blueprint('lab8', __name__)
 
 
@@ -41,4 +42,36 @@ def register():
     db.session.commit()
     return redirect('/lab8/')
 
+
+@lab8.route('/lab8/login', methods = ['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        return render_template('lab8/login.html')
+    
+    login_form = request.form.get('login', '').strip()
+    password_form = request.form.get('password', '').strip()
+
+    if not login_form:
+        return render_template('lab8/login.html',
+                               error='Логин не может быть пустым')
+    
+    if not password_form:
+        return render_template('lab8/login.html',
+                               error='Пароль не может быть пустым')
+
+
+    user = users.query.filter_by(login = login_form).first()
+
+    if user:
+        if check_password_hash(user.password, password_form):
+            login_user(user, remember= False)
+            return redirect('/lab8/')
+        
+    return render_template('lab8/login.html',
+                               error='Логин и/или пароль неверны')
+
+@lab8.route('/lab8/articles/')
+@login_required
+def article_list():
+    return "список статей"
 
