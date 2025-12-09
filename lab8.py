@@ -12,12 +12,7 @@ lab8 = Blueprint('lab8', __name__)
 
 @lab8.route('/lab8/')
 def lab():
-    if 'login' in session:
-        user_login = session['login']
-        user = users.query.filter_by(login=user_login).first()
-        return render_template('lab8/lab8.html', login=user_login, user=user)
-    else:
-        return render_template('lab8/lab8.html')
+   return render_template('lab8/lab8.html')
 
 
 @lab8.route('/lab8/register', methods = ['GET', 'POST'])
@@ -48,8 +43,7 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
-    session['login'] = login_form
-
+    login_user(new_user)
     return redirect('/lab8/')
 
 
@@ -73,15 +67,10 @@ def login():
 
     user = users.query.filter_by(login = login_form).first()
 
-    if user:
-        if check_password_hash(user.password, password_form):
-            session['login'] = login_form
-            if remember_me:
-                session.permanent = True  # Делаем сессию постоянной
-            else:
-                session.permanent = False  # Сессия только для текущей сессии браузера
-
-            return redirect('/lab8/')
+    if user and check_password_hash(user.password, password_form):
+        # ИСПРАВЛЕНО: используем login_user() из Flask-Login
+        login_user(user, remember=remember_me)
+        return redirect('/lab8/')
         
     return render_template('lab8/login.html',
                                error='Логин и/или пароль неверны')
@@ -96,3 +85,110 @@ def article_list():
 def logout():
     logout_user()
     return redirect('/lab8/')
+
+
+
+
+# Список статей пользователя
+@lab8.route('/lab8/list')
+@login_required  # Flask-Login защищает маршрут
+def articles_list():
+    # current_user - объект текущего авторизованного пользователя
+    # Получаем статьи текущего пользователя
+    user_articles = articles.query.filter_by(login_id=current_user.id).all()
+    
+    return render_template('lab8/list_articles.html', articles=user_articles)
+
+
+# Создание статьи
+@lab8.route('/lab8/create', methods=['GET', 'POST'])
+@login_required  # Flask-Login защищает маршрут
+def create_article():
+    if request.method == 'GET':
+        return render_template('lab8/create_article.html')
+    
+    # Получаем данные из формы
+    title = request.form.get('title', '').strip()
+    article_text = request.form.get('article_text', '').strip()
+    is_favorite = bool(request.form.get('is_favorite'))
+    is_public = bool(request.form.get('is_public'))
+    
+    # Проверка на пустые значения
+    if not title:
+        return render_template('lab8/create_article.html', 
+                               error='Название статьи не может быть пустым',
+                               title=title, article_text=article_text,
+                               is_favorite=is_favorite, is_public=is_public)
+    
+    if not article_text:
+        return render_template('lab8/create_article.html', 
+                               error='Текст статьи не может быть пустым',
+                               title=title, article_text=article_text,
+                               is_favorite=is_favorite, is_public=is_public)
+    
+    # Создаем новую статью
+    new_article = articles(
+        title=title,
+        article_text=article_text,
+        is_favorite=is_favorite,
+        is_public=is_public,
+        login_id=current_user.id
+    )
+    
+    db.session.add(new_article)
+    db.session.commit()
+    
+    return redirect('/lab8/list')
+
+# Редактирование статьи
+@lab8.route('/lab8/edit/<int:article_id>', methods=['GET', 'POST'])
+@login_required  # Flask-Login защищает маршрут
+def edit_article(article_id):
+    # Получаем статью текущего пользователя
+    article = articles.query.filter_by(id=article_id, login_id=current_user.id).first()
+    
+    if not article:
+        return "Статья не найдена или у вас нет прав на её редактирование", 404
+    
+    if request.method == 'GET':
+        return render_template('lab8/edit_article.html', article=article)
+    
+    # Обработка POST запроса
+    title = request.form.get('title', '').strip()
+    article_text = request.form.get('article_text', '').strip()
+    is_favorite = bool(request.form.get('is_favorite'))
+    is_public = bool(request.form.get('is_public'))
+    
+    if not title:
+        return render_template('lab8/edit_article.html', 
+                               article=article,
+                               error='Название статьи не может быть пустым')
+    
+    if not article_text:
+        return render_template('lab8/edit_article.html', 
+                               article=article,
+                               error='Текст статьи не может быть пустым')
+    
+    # Обновляем статью
+    article.title = title
+    article.article_text = article_text
+    article.is_favorite = is_favorite
+    article.is_public = is_public
+    
+    db.session.commit()
+    
+    return redirect('/lab8/list')
+
+# Удаление статьи
+@lab8.route('/lab8/delete/<int:article_id>')
+@login_required  # Flask-Login защищает маршрут
+def delete_article(article_id):
+    article = articles.query.filter_by(id=article_id, login_id=current_user.id).first()
+    
+    if article:
+        db.session.delete(article)
+        db.session.commit()
+    
+    return redirect('/lab8/list')
+
+

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 8 - Создание статьи{% endblock %}
+
+{% block main %}
+    <h1>Создание новой статьи</h1>
+    
+    {% if error %}
+    <div style="color: red; background-color: lightpink; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+        <strong>Ошибка:</strong> {{ error }}
+    </div>
+    {% endif %}
+    
+    <form action="/lab8/create" method="post">
+        <div style="margin-bottom: 15px;">
+            <label>
+                Название статьи:<br>
+                <input type="text" maxlength="50" name="title" required>
+            </label>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>
+                Текст статьи:<br>
+                <textarea name="article_text" rows="10" style="width: 100%; padding: 5px;" required>{{ article_text if article_text else '' }}</textarea>
+            </label>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>
+                <input type="checkbox" name="is_favorite" value="true" {% if is_favorite %}checked{% endif %}>
+                Добавить в избранное
+            </label>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>
+                <input type="checkbox" name="is_public" value="true" {% if is_public %}checked{% endif %}>
+                Сделать публичной
+            </label>
+        </div>
+        
+        <div>
+            <button type="submit" style="padding: 10px 20px;">Создать статью</button>
+            <a href="/lab8/list" style="margin-left: 10px;">Отмена</a>
+        </div>
+    </form>
+{% endblock %}
