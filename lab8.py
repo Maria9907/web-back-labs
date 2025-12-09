@@ -17,20 +17,18 @@ def register():
     if request.method == 'GET':
         return render_template('lab8/register.html')
 
-    login_form = request.form.get('login').strip()
-    password_form = request.form.get('password').strip()
+    login_form = request.form.get('login', '').strip()
+    password_form = request.form.get('password', '').strip()
 
-    errors = []
     
     if not login_form:
-        errors.append('Имя пользователя не может быть пустым')
+        return render_template('lab8/register.html',
+                               error='Имя пользователя не может быть пустым')
     
     if not password_form:
-        errors.append('Пароль не может быть пустым')
-    
-    if errors:
         return render_template('lab8/register.html',
-                               errors=errors)
+                               error='Пароль не может быть пустым')
+    
     
     login_exists = users.query.filter_by(login = login_form).first()
     if login_exists:
