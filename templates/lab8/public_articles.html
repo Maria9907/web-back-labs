@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 8{% endblock %}  <!-- Изменено с lab5 на lab8 -->
+
+{% block main %}
+    <h1>Публичные статьи</h1>
+
+    
+    <form action="/lab8/public" method="get" style="margin-bottom: 20px;">
+        <input type="text" name="query" placeholder="Поиск по статьям..." 
+               value="{{ query if query else '' }}" style="padding: 8px; width: 300px;">
+        <button type="submit" style="padding: 8px 15px;">Найти</button>
+        {% if query %}
+            <a href="/lab8/public" style="margin-left: 10px;">Сбросить поиск</a>
+        {% endif %}
+    </form>
+
+    {% if query %}
+        <p style="margin-bottom: 15px;">
+            Результаты поиска по запросу: "<strong>{{ query }}</strong>"
+        </p>
+    {% endif %}
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    {% if not articles %}
+        <p>{% if query %}Ничего не найдено{% else %}Пока нет публичных статей.{% endif %}</p>
+    {% else %}
+        {% for article in articles %}
+            <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 5px; {% if article.is_favorite %}background-color: #fffacd;{% endif %}">
+
+                <h2>{{ article.title }}</h2>  
+                <blockquote>{{ article.article_text }}</blockquote> 
+                
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <div style="margin-top: 20px;">
+        {% if current_user.is_authenticated %}
+            <a href="/lab8/articles">Мои статьи</a> | 
+        {% else %}
+            <a href="/lab8/login">Войти</a> | 
+        {% endif %}
+        <a href="/lab8/">На главную</a>
+    </div>
+{% endblock %}

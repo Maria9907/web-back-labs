@@ -19,16 +19,16 @@
                     Пароль: <input type="password"  name="password">
                 </label>
             </div>
-            
+
             <div>
                 <label>
-                    <input type="checkbox" name="remember" value="true">
+                    <input type="checkbox" name="remember_me" value="true">
                     Запомнить меня
                 </label>
             </div>
 
             {% if error %}
-        <div style="color: red; background-color: lightpink; padding: 10px; border-radius: 5px; margin-bottom: 20px; ">
+        <div class="error">
             <strong>Ошибка:</strong> {{ error }}
         </div>
         {% endif %}

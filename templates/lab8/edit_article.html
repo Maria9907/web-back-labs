@@ -6,7 +6,7 @@
     <h1>Редактирование статьи</h1>
     
     {% if error %}
-    <div style="color: red; background-color: lightpink; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+    <div class="error">
         <strong>Ошибка:</strong> {{ error }}
     </div>
     {% endif %}
@@ -16,23 +16,18 @@
             <label>
                 Название статьи:<br>
                 <input type="text" name="title" style="width: 300px; padding: 5px;" 
-                       value="{{ article.title }}" required maxlength="50">
+                       value="{{ article.title }}"  maxlength="50">
             </label>
         </div>
         
         <div style="margin-bottom: 15px;">
             <label>
                 Текст статьи:<br>
-                <textarea name="article_text" rows="10" style="width: 100%; padding: 5px;" required>{{ article.article_text }}</textarea>
+                <textarea name="article_text" rows="10" style="width: 100%; padding: 5px;" >{{ article.article_text }}</textarea>
             </label>
         </div>
         
-        <div style="margin-bottom: 15px;">
-            <label>
-                <input type="checkbox" name="is_favorite" value="true" {% if article.is_favorite %}checked{% endif %}>
-                В избранном
-            </label>
-        </div>
+
         
         <div style="margin-bottom: 15px;">
             <label>
@@ -43,7 +38,7 @@
         
         <div>
             <button type="submit" style="padding: 10px 20px;">Сохранить изменения</button>
-            <a href="/lab8/list" style="margin-left: 10px;">Отмена</a>
+            <a href="/lab8/" style="margin-left: 10px;">Отмена</a>
         </div>
     </form>
 {% endblock %}

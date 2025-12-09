@@ -75,10 +75,7 @@ def login():
     return render_template('lab8/login.html',
                                error='Логин и/или пароль неверны')
 
-@lab8.route('/lab8/articles/')
-@login_required
-def article_list():
-    return "список статей"
+
 
 @lab8.route('/lab8/logout')
 @login_required
@@ -89,15 +86,6 @@ def logout():
 
 
 
-# Список статей пользователя
-@lab8.route('/lab8/list')
-@login_required  # Flask-Login защищает маршрут
-def articles_list():
-    # current_user - объект текущего авторизованного пользователя
-    # Получаем статьи текущего пользователя
-    user_articles = articles.query.filter_by(login_id=current_user.id).all()
-    
-    return render_template('lab8/list_articles.html', articles=user_articles)
 
 
 # Создание статьи
@@ -138,7 +126,7 @@ def create_article():
     db.session.add(new_article)
     db.session.commit()
     
-    return redirect('/lab8/list')
+    return redirect('/lab8/articles')
 
 # Редактирование статьи
 @lab8.route('/lab8/edit/<int:article_id>', methods=['GET', 'POST'])
@@ -177,7 +165,7 @@ def edit_article(article_id):
     
     db.session.commit()
     
-    return redirect('/lab8/list')
+    return redirect('/lab8/articles')
 
 # Удаление статьи
 @lab8.route('/lab8/delete/<int:article_id>')
@@ -189,6 +177,59 @@ def delete_article(article_id):
         db.session.delete(article)
         db.session.commit()
     
-    return redirect('/lab8/list')
+    return redirect('/lab8/articles')
 
 
+@lab8.route('/lab8/public')
+def public_articles():
+    query = request.args.get('query', '').strip().lower()
+    
+    # Получаем все публичные статьи
+    base_query = articles.query.filter_by(is_public=True)
+    
+    # Если есть поисковый запрос
+    if query:
+        articles_list = []
+        all_public_articles = base_query.all()
+        
+        for article in all_public_articles:
+            title_lower = article.title.lower() if article.title else ""
+            text_lower = article.article_text.lower() if article.article_text else ""
+            
+            if query in title_lower or query in text_lower:
+                articles_list.append(article)
+    else:
+        articles_list = base_query.all()
+    
+    return render_template('lab8/public_articles.html', 
+                          articles=articles_list, 
+                          query=query)
+
+
+@lab8.route('/lab8/articles')
+@login_required
+def article_list():
+    query = request.args.get('query', '').strip().lower()
+    
+    # Для авторизованного пользователя показываем публичные + свои статьи
+    base_query = articles.query.filter(
+        (articles.is_public == True) | (articles.login_id == current_user.id)
+    )
+    
+    # Если есть поисковый запрос
+    if query:
+        articles_list = []
+        all_articles = base_query.all()
+        
+        for article in all_articles:
+            title_lower = article.title.lower() if article.title else ""
+            text_lower = article.article_text.lower() if article.article_text else ""
+            
+            if query in title_lower or query in text_lower:
+                articles_list.append(article)
+    else:
+        articles_list = base_query.all()
+    
+    return render_template('lab8/articles.html', 
+                          articles=articles_list, 
+                          query=query)
