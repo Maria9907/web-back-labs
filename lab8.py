@@ -14,7 +14,7 @@ lab8 = Blueprint('lab8', __name__)
 def lab():
    return render_template('lab8/lab8.html')
 
-
+# Регистрация
 @lab8.route('/lab8/register', methods = ['GET', 'POST'])
 def register():
     if request.method == 'GET':
@@ -46,7 +46,7 @@ def register():
     login_user(new_user)
     return redirect('/lab8/')
 
-
+# Авторизация
 @lab8.route('/lab8/login', methods = ['GET', 'POST'])
 def login():
     if request.method == 'GET':
@@ -68,7 +68,6 @@ def login():
     user = users.query.filter_by(login = login_form).first()
 
     if user and check_password_hash(user.password, password_form):
-        # ИСПРАВЛЕНО: используем login_user() из Flask-Login
         login_user(user, remember=remember_me)
         return redirect('/lab8/')
         
@@ -76,7 +75,7 @@ def login():
                                error='Логин и/или пароль неверны')
 
 
-
+# Выход из аккаунта
 @lab8.route('/lab8/logout')
 @login_required
 def logout():
@@ -85,23 +84,20 @@ def logout():
 
 
 
-
-
-
 # Создание статьи
 @lab8.route('/lab8/create', methods=['GET', 'POST'])
-@login_required  # Flask-Login защищает маршрут
+@login_required  
 def create_article():
     if request.method == 'GET':
         return render_template('lab8/create_article.html')
     
-    # Получаем данные из формы
+    
     title = request.form.get('title', '').strip()
     article_text = request.form.get('article_text', '').strip()
     is_favorite = bool(request.form.get('is_favorite'))
     is_public = bool(request.form.get('is_public'))
     
-    # Проверка на пустые значения
+   
     if not title:
         return render_template('lab8/create_article.html', 
                                error='Название статьи не может быть пустым',
@@ -114,7 +110,7 @@ def create_article():
                                title=title, article_text=article_text,
                                is_favorite=is_favorite, is_public=is_public)
     
-    # Создаем новую статью
+    
     new_article = articles(
         title=title,
         article_text=article_text,
@@ -130,9 +126,9 @@ def create_article():
 
 # Редактирование статьи
 @lab8.route('/lab8/edit/<int:article_id>', methods=['GET', 'POST'])
-@login_required  # Flask-Login защищает маршрут
+@login_required  
 def edit_article(article_id):
-    # Получаем статью текущего пользователя
+    
     article = articles.query.filter_by(id=article_id, login_id=current_user.id).first()
     
     if not article:
@@ -141,7 +137,7 @@ def edit_article(article_id):
     if request.method == 'GET':
         return render_template('lab8/edit_article.html', article=article)
     
-    # Обработка POST запроса
+    
     title = request.form.get('title', '').strip()
     article_text = request.form.get('article_text', '').strip()
     is_favorite = bool(request.form.get('is_favorite'))
@@ -157,7 +153,7 @@ def edit_article(article_id):
                                article=article,
                                error='Текст статьи не может быть пустым')
     
-    # Обновляем статью
+    
     article.title = title
     article.article_text = article_text
     article.is_favorite = is_favorite
@@ -169,7 +165,7 @@ def edit_article(article_id):
 
 # Удаление статьи
 @lab8.route('/lab8/delete/<int:article_id>')
-@login_required  # Flask-Login защищает маршрут
+@login_required  
 def delete_article(article_id):
     article = articles.query.filter_by(id=article_id, login_id=current_user.id).first()
     
@@ -179,7 +175,7 @@ def delete_article(article_id):
     
     return redirect('/lab8/articles')
 
-
+# Вывод публичных статей
 @lab8.route('/lab8/public')
 def public_articles():
     query = request.args.get('query', '').strip().lower()
@@ -187,7 +183,7 @@ def public_articles():
     # Получаем все публичные статьи
     base_query = articles.query.filter_by(is_public=True)
     
-    # Если есть поисковый запрос
+   
     if query:
         articles_list = []
         all_public_articles = base_query.all()
@@ -205,18 +201,17 @@ def public_articles():
                           articles=articles_list, 
                           query=query)
 
-
+# Поиск-мои статьи
 @lab8.route('/lab8/articles')
 @login_required
 def article_list():
     query = request.args.get('query', '').strip().lower()
     
-    # Для авторизованного пользователя показываем публичные + свои статьи
+    
     base_query = articles.query.filter(
         (articles.is_public == True) | (articles.login_id == current_user.id)
     )
     
-    # Если есть поисковый запрос
     if query:
         articles_list = []
         all_articles = base_query.all()
