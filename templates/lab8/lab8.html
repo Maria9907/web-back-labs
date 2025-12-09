@@ -1,0 +1,35 @@
+{% extends "base.html" %} 
+
+{# номер лабораторной работы: #}
+{% block lab %}Лабораторная работа 8{% endblock %}
+
+{# основной контент: #}
+{% block main %}
+    <h1>База знаний</h1>
+
+     <div style="margin-bottom: 20px;">
+        {% if login %}
+            <p>Добро пожаловать, <strong>{{ login }}</strong>!</p>
+        {% else %}
+            <p>Добро пожаловать, <strong>Гость</strong>!</p>
+        {% endif %}
+    </div>
+
+    
+     <nav class="nav-panel" style="margin-bottom: 20px;">
+        <a href="/lab5/public" class="nav-button">Публичные статьи</a>
+        
+        {% if login %}
+            <a href="/lab8/list" class="nav-button">Мои статьи</a>
+            <a href="/lab8/create" class="nav-button">Создать статью</a>
+            <a href="/lab8/users" class="nav-button">Список пользователей</a>
+            <a href="/lab8/profile" class="nav-button">Профиль</a>
+            <a href="/lab8/logout" class="nav-button logout">Выйти</a>
+            <span class="user-info">Пользователь: {{ login }}</span>
+        {% else %}
+            <a href="/lab8/login" class="nav-button">Войти</a>
+            <a href="/lab8/register" class="nav-button">Регистрация</a>
+        {% endif %}
+    </nav>
+    
+{% endblock %}
