@@ -5,5 +5,5 @@ from psycopg2.extras import RealDictCursor
 import sqlite3
 from os import path
 
-lab7 = Blueprint('lab8', __name__)
+lab8 = Blueprint('lab8', __name__)
 
