@@ -19,6 +19,13 @@
                     Пароль: <input type="password"  name="password">
                 </label>
             </div>
+            
+            <div>
+                <label>
+                    <input type="checkbox" name="remember" value="true">
+                    Запомнить меня
+                </label>
+            </div>
 
             {% if error %}
         <div style="color: red; background-color: lightpink; padding: 10px; border-radius: 5px; margin-bottom: 20px; ">
@@ -30,6 +37,9 @@
 
             
         </form>
+         <div style="margin-top: 20px;">
+        <p>Еще нет аккаунта? <a href="/lab8/register">Зарегистрируйтесь</a></p>
+    </div>   
 
        
         

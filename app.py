@@ -14,6 +14,7 @@ from db import db
 from os import path
 from db.models import users
 from flask_login import LoginManager
+from datetime import timedelta
 
 
 from lab1 import lab1
@@ -37,6 +38,7 @@ def load_users(login_id):
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'секретно-секретный секрет')
 app.config['DB_TYPE'] = os.getenv('DB_TYPE', 'postgres')
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 
 if app.config['DB_TYPE'] == 'postgres':
     db_name = 'maria_matyushkina_orm'
