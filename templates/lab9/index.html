@@ -8,29 +8,39 @@
 <div class="new-year-theme">
     <h1>🎄 Новогодние поздравления 🎄</h1>
     
-    <div >
+    
+    <div class="user-panel">
+        {% if is_authenticated %}
+        <div>
+            <span class="welcome-text">Добро пожаловать, <strong>{{ user_full_name }}</strong>!</span>
+            <a href="{{ url_for('lab9.logout') }}" style="margin: 5px; ">Выйти</a>
+        </div>
+        {% else %}
+        <div style="margin: 10px;">
+            <a href="{{ url_for('lab9.login') }}" class="btn login-btn">Войти</a>
+            <a href="{{ url_for('lab9.register') }}" class="btn register-btn">Зарегистрироваться</a>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="stats-panel">
         <p>Вы открыли: <span id="user-opened-count">{{ opened_count }}</span> из 3 коробок</p>
         <p>Осталось закрытых: <span id="closed-count">{{ closed_count }}</span></p>
-        <p id="auth-status" style="display: none;">
-            Статус: <span id="auth-text">Не авторизован</span>
-        </p>
+        {% if is_authenticated %}
+        <p class="auth-status">✅ Вы авторизованы как: {{ user_login }}</p>
+        {% else %}
+        <p class="auth-status">Вы не авторизованы</p>
+        {% endif %}
     </div>
     
-    <div>
-        <div  style="display: none;">
-            <h3>🎅 Для Дед Мороза:</h3>
-            <input type="password" id="password" placeholder="Введите пароль (secret)" style="padding: 8px; margin-right: 10px;">
-            <button id="login-btn" class="btn">Войти как Дед Мороз</button>
-        </div>
-        
-        <div  style="display: none;">
-            <h3>🎅 Вы вошли как Дед Мороз</h3>
-            <button id="reset-btn" class="btn santa-btn">Наполнить все коробки заново</button>
-            <button id="logout-btn" class="btn">Выйти</button>
-        </div>
+    {% if is_authenticated %}
+    <div class="santa-panel">
+        <h3>Панель Деда Мороза</h3>
+        <button id="reset-btn" class="btn santa-btn">Наполнить все коробки заново</button>
     </div>
+    {% endif %}
     
-    <!-- Всплывающее окно с подарком -->
+
     <div id="gift-popup" class="gift-popup" style="display: none;">
         <div class="gift-popup-content">
             <button class="close-popup" onclick="closeGiftPopup()">×</button>
@@ -41,13 +51,16 @@
         </div>
     </div>
     
-    <!-- Контейнер для коробок -->
+    
+    
     <div class="boxes-container">
         {% for box in boxes %}
-        <div class="gift-box {% if box.is_opened %}opened{% endif %}" 
+        <div class="gift-box {% if box.is_opened %}opened{% endif %} {% if box.requires_auth %}requires-auth{% endif %}" 
              data-id="{{ box.box_id }}"
              data-gift="{{ box.gift_image }}"
              data-message="{{ box.message }}"
+             data-requires-auth="{{ box.requires_auth }}"
+             title="{% if box.requires_auth %}Требуется авторизация{% endif %}"
              style="left: {{ positions[loop.index0][0] }}%; top: {{ positions[loop.index0][1] }}%;">
             <div class="box-content">
                 {% if box.is_opened %}
@@ -58,50 +71,32 @@
                 {% else %}
                     <div class="before-open-box">
                         <img src="/static/lab9/box_closed_{{ loop.index }}.png" alt="Коробка {{ loop.index }}" class="box-img">
+                        
                     </div>
-                    <div>Закрыта</div>
+                    <div class="box-status">Закрыта</div>
                 {% endif %}
-                <div class="box-number">Коробка {{ loop.index }}</div>
+                <div class="box-number">
+                    Коробка {{ loop.index }}
+                    {% if box.requires_auth %}
+                    <span class="auth-badge">🔒</span>
+                    {% endif %}
+                </div>
             </div>
         </div>
         {% endfor %}
     </div>
+    
+    <div class="hint">
+        <p> <strong>Подсказка:</strong> Коробки с символом 🔒 открываются только авторизованным пользователям!</p>
+      
+    </div>
 </div>
 
-
 <script>
-
 let openedBoxes = [];
 
-function checkAuthStatus() {
-    fetch('/lab9/rest-api/auth/status')
-        .then(function(data) {
-            return data.json();
-        })
-        .then(function(result) {
-            const authSection = document.getElementById('auth-section');
-            const santaSection = document.getElementById('santa-section');
-            const authText = document.getElementById('auth-text');
-            const authStatus = document.getElementById('auth-status');
-            
-            if (result.authenticated) {
-                authSection.style.display = 'none';
-                santaSection.style.display = 'block';
-                authText.textContent = 'Дед Мороз';
-                authStatus.style.display = 'block';
-            } else {
-                authSection.style.display = 'block';
-                santaSection.style.display = 'none';
-                authText.textContent = 'Не авторизован';
-                authStatus.style.display = 'block';
-            }
-        })
-        .catch(function(error) {
-            console.error('Ошибка при проверке статуса авторизации:', error);
-        });
-}
-
 function openBox(boxId) {
+    // Сначала проверяем коробку через API
     fetch(`/lab9/rest-api/boxes/${boxId}/open`, {
         method: 'POST',
         headers: { 
@@ -118,7 +113,11 @@ function openBox(boxId) {
     })
     .then(function(data) {
         if (data.error) {
-            showError(data.error);
+            if (data.requires_auth) {
+                showAuthPopup(boxId);
+            } else {
+                showError(data.error);
+            }
         } else {
             // Обновляем счетчики
             document.getElementById('user-opened-count').textContent = data.user_opened_count;
@@ -135,12 +134,26 @@ function openBox(boxId) {
         }
     })
     .catch(function(error) {
-        showError(error.error || 'Ошибка при открытии коробки');
+        if (error.requires_auth) {
+            showAuthPopup(boxId);
+        } else {
+            showError(error.error || 'Ошибка при открытии коробки');
+        }
     });
 }
 
+function showAuthPopup(boxId) {
+    document.getElementById('auth-popup-text').textContent = 
+        `Для открытия коробки ${parseInt(boxId) + 1} необходимо авторизоваться.`;
+    document.getElementById('auth-popup').style.display = 'flex';
+}
+
+function closeAuthPopup() {
+    document.getElementById('auth-popup').style.display = 'none';
+}
+
 function resetAllBoxes() {
-    if (!confirm('Дед Мороз, вы уверены, что хотите наполнить все коробки заново?')) {
+    if (!confirm('🎅 Дед Мороз, вы уверены, что хотите наполнить все коробки заново?')) {
         return;
     }
     
@@ -165,56 +178,6 @@ function resetAllBoxes() {
     })
     .catch(function(error) {
         showError(error.error || 'Ошибка при сбросе коробок');
-    });
-}
-
-function login() {
-    const password = document.getElementById('password').value;
-    
-    if (!password) {
-        showError('Введите пароль');
-        return;
-    }
-    
-    fetch('/lab9/rest-api/auth/login', {
-        method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ password: password })
-    })
-    .then(function(response) {
-        if (!response.ok) {
-            return response.json().then(function(err) { 
-                throw err; 
-            });
-        }
-        return response.json();
-    })
-    .then(function(data) {
-        if (data.error) {
-            showError(data.error);
-        } else {
-            alert(data.message);
-            checkAuthStatus(); // Обновляем статус
-            document.getElementById('password').value = ''; // Очищаем поле
-        }
-    })
-    .catch(function(error) {
-        showError(error.error || 'Ошибка при авторизации');
-    });
-}
-
-function logout() {
-    fetch('/lab9/rest-api/auth/logout', {
-        method: 'POST'
-    })
-    .then(function() {
-        alert('Вы вышли из системы');
-        checkAuthStatus(); // Обновляем статус
-    })
-    .catch(function(error) {
-        showError('Ошибка при выходе');
     });
 }
 
@@ -255,6 +218,12 @@ function updateBoxAfterOpen(boxId, giftImage) {
         status.textContent = 'Открыта';
     }
     
+    // Убираем замок, если он был
+    const lock = boxElement.querySelector('.auth-lock');
+    if (lock) {
+        lock.style.display = 'none';
+    }
+    
     // Помечаем коробку как открытую
     boxElement.classList.add('opened');
 }
@@ -262,10 +231,6 @@ function updateBoxAfterOpen(boxId, giftImage) {
 // ========== ИНИЦИАЛИЗАЦИЯ ==========
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Проверяем статус авторизации
-    checkAuthStatus();
-    
-    // Назначаем обработчики на коробки
     // Назначаем обработчики на коробки
     const boxes = document.querySelectorAll('.gift-box:not(.opened)');
     boxes.forEach(function(box) {
@@ -279,24 +244,21 @@ document.addEventListener('DOMContentLoaded', function() {
             openBox(parseInt(boxId));
         });
     });
-    
-    // Назначаем обработчики на кнопки
-    const loginBtn = document.getElementById('login-btn');
-    if (loginBtn) {
-        loginBtn.addEventListener('click', login);
-    }
-    
+    // Назначаем обработчик на кнопку Деда Мороза
     const resetBtn = document.getElementById('reset-btn');
     if (resetBtn) {
         resetBtn.addEventListener('click', resetAllBoxes);
     }
     
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', logout);
-    }
-    
-    
+    // Показываем подсказку для коробок с авторизацией
+    const authBoxes = document.querySelectorAll('.gift-box.requires-auth:not(.opened)');
+    authBoxes.forEach(function(box) {
+        box.addEventListener('mouseenter', function() {
+            if (!this.classList.contains('opened') && this.dataset.requiresAuth === 'True') {
+                this.setAttribute('title', '🔒 Требуется авторизация');
+            }
+        });
+    });
 });
 </script>
 {% endblock %}

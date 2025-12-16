@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, session, jsonify, request, current_app
+from flask import Blueprint, render_template, session, jsonify, request, current_app, redirect, url_for
 import random
 from os import path
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import sqlite3
+import hashlib
 
 lab9 = Blueprint('lab9', __name__)
 
@@ -31,6 +32,56 @@ def db_close(conn, cur):
     cur.close()
     conn.close()
 
+def hash_password(password):
+    """Хеширование пароля"""
+    return hashlib.sha256(password.encode()).hexdigest()
+
+#ПОЛЬЗОВАТЕЛИ
+
+def get_user_by_login(login):
+    conn, cur = db_connect()
+    try:
+        if current_app.config['DB_TYPE'] == 'postgres':
+            query = "SELECT id, login,full_name, password FROM users WHERE login = %s"
+        else:
+            query = "SELECT id, login,full_name, password FROM users WHERE login = ?"
+        
+        cur.execute(query, (login,))
+        user = cur.fetchone()
+        return dict(user) if user else None
+    except Exception as e:
+        print(f"Ошибка при получении пользователя: {e}")
+        return None
+    finally:
+        db_close(conn, cur)
+
+def create_user(login, password):
+    conn, cur = db_connect()
+    try:
+        
+        existing_user = get_user_by_login(login)
+        if existing_user:
+            return False, "Пользователь с таким логином уже существует"
+        hashed_password = hash_password(password)
+        
+        full_name = login.capitalize()
+        
+        if current_app.config['DB_TYPE'] == 'postgres':
+            query = "INSERT INTO users (login, password, full_name) VALUES (%s, %s, %s)"
+        else:
+            query = "INSERT INTO users (login, password, full_name) VALUES (?, ?, ?)"
+        
+        cur.execute(query, (login, hashed_password, full_name))
+        conn.commit()
+        return True, "Пользователь успешно создан"
+    except Exception as e:
+        print(f"Ошибка при создании пользователя: {e}")
+        conn.rollback()
+        return False, f"Ошибка при создании пользователя: {str(e)}"
+    finally:
+        db_close(conn, cur)
+
+# КОРОБКИ
 
 def get_all_boxes():
     conn, cur = db_connect()
@@ -72,6 +123,7 @@ def get_box_by_id(box_id):
 
 def update_box_state(box_id, is_opened):
     conn, cur = db_connect()
+    
     try:
         if current_app.config['DB_TYPE'] == 'postgres':
             query = "UPDATE gift_boxes SET is_opened = %s WHERE box_id = %s"
@@ -81,10 +133,6 @@ def update_box_state(box_id, is_opened):
         cur.execute(query, (is_opened, box_id))
         conn.commit()
         return True
-    except Exception as e:
-        print(f"Ошибка при обновлении коробки {box_id}: {e}")
-        conn.rollback()
-        return False
     finally:
         db_close(conn, cur)
 
@@ -124,6 +172,13 @@ def count_opened_boxes():
         db_close(conn, cur)
 
 
+#КОРОБКИ ДЛЯ АВТОРИЗОВАННЫХ
+def is_protected_box(box_id):
+    protected_box_ids = [7, 8]  
+    return box_id in protected_box_ids
+
+
+
 @lab9.route('/lab9/')
 def main():
     if 'box_positions' not in session:
@@ -138,60 +193,187 @@ def main():
                 positions.append((left, top))
         session['box_positions'] = positions
     
-    if 'opened_count' not in session:
-        session['opened_count'] = 0
-    
+    # Получаем данные из БД
     boxes = get_all_boxes()
+    
+    # Добавляем информацию о защищенных коробках
+    for box in boxes:
+        box['requires_auth'] = is_protected_box(box['box_id'])
     
     total_opened = count_opened_boxes()
     closed_count = 10 - total_opened
+    
+    is_authenticated = 'user_id' in session
+    user_login = session.get('user_login', None)
+    user_full_name = session.get('user_full_name', None)
+    
+    if is_authenticated:
+        if 'authenticated_opened_count' not in session:
+            session['authenticated_opened_count'] = 0
+        opened_count = session['authenticated_opened_count']
+    else:
+        if 'guest_opened_count' not in session:
+            session['guest_opened_count'] = 0
+        opened_count = session['guest_opened_count']
     
     return render_template('lab9/index.html', 
                          boxes=boxes,
                          positions=session['box_positions'],
                          closed_count=closed_count,
-                         opened_count=session['opened_count'])
+                         opened_count=opened_count,
+                         is_authenticated=is_authenticated,
+                         user_login=user_login,
+                         user_full_name=user_full_name)
+
+
+@lab9.route('/lab9/login', methods=['GET', 'POST'])
+def login():
+    """Страница входа"""
+    error = None
+    
+    if request.method == 'POST':
+        login_input = request.form.get('login')
+        password = request.form.get('password')
+        remember_me = request.form.get('remember_me') == 'true'
+        
+        if not login_input or not password:
+            error = "Логин и пароль обязательны для заполнения"
+        else:
+            user = get_user_by_login(login_input)
+            
+            if user:
+                hashed_password = hash_password(password)
+                if user['password'] == hashed_password:
+                    # Сохраняем в сессии
+                    session['user_id'] = user['id']
+                    session['user_login'] = user['login']
+                    session['user_full_name'] = user['full_name']
+                    
+                    session.pop('guest_opened_count', None)
+                    session['authenticated_opened_count'] = 0
+                    
+                    if remember_me:
+                        session.permanent = True
+                    return redirect(url_for('lab9.main'))
+                else:
+                    error = "Неверный пароль"
+            else:
+                error = "Пользователь не найден"
+    
+    return render_template('lab9/login.html', error=error)
+
+@lab9.route('/lab9/register', methods=['GET', 'POST'])
+def register():
+    error = None
+    
+    if request.method == 'POST':
+        login_input = request.form.get('login')
+        password = request.form.get('password')
+        
+        if not login_input or not password:
+            error = "Логин и пароль обязательны для заполнения"
+        elif len(password) < 6:
+            error = "Пароль должен содержать не менее 6 символов"
+        else:
+            success, message = create_user(login_input, password)
+            
+            if success:
+                user = get_user_by_login(login_input)
+                session['user_id'] = user['id']
+                session['user_login'] = user['login']
+                session['user_full_name'] = user['full_name']
+                
+                session.pop('guest_opened_count', None)
+                session['authenticated_opened_count'] = 0
+
+                return redirect(url_for('lab9.main'))
+            else:
+                error = message
+    
+    return render_template('lab9/register.html', error=error)
+
+@lab9.route('/lab9/logout')
+def logout():
+    """Выход из системы"""
+    session.pop('user_id', None)
+    session.pop('user_login', None)
+    session.pop('user_full_name', None)
+    session.pop('authenticated_opened_count', None)
+    return redirect(url_for('lab9.main'))
+
+
 
 @lab9.route('/lab9/rest-api/boxes/', methods=['GET'])
 def get_boxes_api():
     """REST API: получить все коробки"""
     boxes = get_all_boxes()
+    
+    for box in boxes:
+        box['requires_auth'] = is_protected_box(box['box_id'])
+    
     return jsonify(boxes)
 
 @lab9.route('/lab9/rest-api/boxes/<int:box_id>', methods=['GET'])
 def get_box_api(box_id):
+    """REST API: получить конкретную коробку"""
     box = get_box_by_id(box_id)
     if not box:
         return jsonify({"error": "Коробка не найдена"}), 404
+    
+    # Проверяем, является ли коробка защищенной
+    requires_auth = is_protected_box(box_id)
+    box['requires_auth'] = requires_auth
+    
+    if requires_auth and 'user_id' not in session:
+        return jsonify({
+            "error": "Для открытия этой коробки необходимо авторизоваться",
+            "requires_auth": True,
+            "box_id": box_id
+        }), 403
+    
     return jsonify(box)
 
 @lab9.route('/lab9/rest-api/boxes/<int:box_id>/open', methods=['POST'])
 def open_box_api(box_id):
+    """REST API: открыть коробку"""
     try:
-        # Проверяем валидность ID
         if box_id < 0 or box_id >= 10:
             return jsonify({"error": "Некорректный ID коробки"}), 400
         
-        # Получаем коробку из БД
+        requires_auth = is_protected_box(box_id)
+        
+        if requires_auth and 'user_id' not in session:
+            return jsonify({
+                "error": "Для открытия этой коробки необходимо авторизоваться",
+                "requires_auth": True
+            }), 403
+        
         box = get_box_by_id(box_id)
         if not box:
             return jsonify({"error": "Коробка не найдена"}), 404
         
-        # Проверяем, не открыта ли уже
         if box['is_opened']:
             return jsonify({"error": "Эта коробка уже открыта!"}), 400
         
-        # Проверяем лимит для пользователя
-        if session.get('opened_count', 0) >= 3:
-            return jsonify({"error": "Вы уже открыли 3 коробки!"}), 403
+        if 'user_id' in session:
+            opened_count = session.get('authenticated_opened_count', 0)
+            if opened_count >= 3:
+                return jsonify({"error": "Вы уже открыли 3 коробки!"}), 403
+        else:
+            opened_count = session.get('guest_opened_count', 0)
+            if opened_count >= 3:
+                return jsonify({"error": "Вы уже открыли 3 коробки!"}), 403
         
-        # Открываем коробку в БД
         if update_box_state(box_id, True):
-            # Обновляем счетчик пользователя
-            session['opened_count'] = session.get('opened_count', 0) + 1
+            if 'user_id' in session:
+                session['authenticated_opened_count'] = session.get('authenticated_opened_count', 0) + 1
+                user_opened_count = session['authenticated_opened_count']
+            else:
+                session['guest_opened_count'] = session.get('guest_opened_count', 0) + 1
+                user_opened_count = session['guest_opened_count']
+            
             session.modified = True
             
-            # Получаем обновленную статистику
             total_opened = count_opened_boxes()
             closed_count = 10 - total_opened
             
@@ -199,7 +381,7 @@ def open_box_api(box_id):
                 "success": True,
                 "message": box['message'],
                 "gift": box['gift_image'],
-                "user_opened_count": session['opened_count'],
+                "user_opened_count": user_opened_count,
                 "total_opened_count": total_opened,
                 "closed_count": closed_count,
                 "box_id": box_id
@@ -214,45 +396,17 @@ def open_box_api(box_id):
 def reset_boxes_api():
     """REST API: сбросить все коробки (Дед Мороз)"""
     # Проверяем авторизацию
-    if not session.get('authenticated'):
+    if 'user_id' not in session:
         return jsonify({"error": "Только для авторизованных пользователей"}), 401
     
     if reset_all_boxes():
-        # Сбрасываем счетчик пользователя
-        session['opened_count'] = 0
+        session['authenticated_opened_count'] = 0
         session.modified = True
         
         return jsonify({
             "success": True,
-            "message": "Дед Мороз наполнил все коробки заново! ",
+            "message": f"Дед Мороз {session.get('user_full_name', '')} наполнил все коробки заново! ",
             "closed_count": 10
         })
     else:
         return jsonify({"error": "Ошибка при сбросе коробок"}), 500
-
-@lab9.route('/lab9/rest-api/auth/login', methods=['POST'])
-def login_api():
-    """REST API: авторизация"""
-    data = request.json
-    if not data or 'password' not in data:
-        return jsonify({"error": "Не указан пароль"}), 400
-    
-    # Простая проверка пароля
-    if data.get('password') == 'secret':
-        session['authenticated'] = True
-        return jsonify({"success": True, "message": "Вы авторизованы как Дед Мороз "})
-    else:
-        return jsonify({"error": "Неверный пароль"}), 401
-
-@lab9.route('/lab9/rest-api/auth/logout', methods=['POST'])
-def logout_api():
-    """REST API: выход"""
-    session.pop('authenticated', None)
-    return jsonify({"success": True, "message": "Вы вышли из системы"})
-
-@lab9.route('/lab9/rest-api/auth/status', methods=['GET'])
-def auth_status_api():
-    """REST API: статус авторизации"""
-    return jsonify({
-        "authenticated": session.get('authenticated', False)
-    })
