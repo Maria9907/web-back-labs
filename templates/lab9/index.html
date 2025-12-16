@@ -60,7 +60,6 @@
              data-gift="{{ box.gift_image }}"
              data-message="{{ box.message }}"
              data-requires-auth="{{ box.requires_auth }}"
-             title="{% if box.requires_auth %}Требуется авторизация{% endif %}"
              style="left: {{ positions[loop.index0][0] }}%; top: {{ positions[loop.index0][1] }}%;">
             <div class="box-content">
                 {% if box.is_opened %}
@@ -93,8 +92,10 @@
 </div>
 
 <script>
+// Массив для хранения ID открытых коробок
 let openedBoxes = [];
 
+// Функция открытия коробки
 function openBox(boxId) {
     // Сначала проверяем коробку через API
     fetch(`/lab9/rest-api/boxes/${boxId}/open`, {
@@ -123,13 +124,10 @@ function openBox(boxId) {
             document.getElementById('user-opened-count').textContent = data.user_opened_count;
             document.getElementById('closed-count').textContent = data.closed_count;
             
-            // Показываем подарок
             showGiftPopup(data.message, data.gift);
             
-            // Обновляем вид коробки
             updateBoxAfterOpen(boxId, data.gift);
             
-            // Сохраняем ID открытой коробки
             openedBoxes.push(boxId);
         }
     })
@@ -141,7 +139,7 @@ function openBox(boxId) {
         }
     });
 }
-
+// Функция показа подарка с требованием авторизации
 function showAuthPopup(boxId) {
     document.getElementById('auth-popup-text').textContent = 
         `Для открытия коробки ${parseInt(boxId) + 1} необходимо авторизоваться.`;
@@ -151,9 +149,9 @@ function showAuthPopup(boxId) {
 function closeAuthPopup() {
     document.getElementById('auth-popup').style.display = 'none';
 }
-
+// Функция сброса всех коробок (функция Деда Мороза)
 function resetAllBoxes() {
-    if (!confirm('🎅 Дед Мороз, вы уверены, что хотите наполнить все коробки заново?')) {
+    if (!confirm(' Дед Мороз, вы уверены, что хотите наполнить все коробки заново?')) {
         return;
     }
     
@@ -173,7 +171,7 @@ function resetAllBoxes() {
             showError(data.error);
         } else {
             alert(data.message);
-            location.reload(); // Перезагружаем страницу
+            location.reload(); 
         }
     })
     .catch(function(error) {
@@ -181,12 +179,11 @@ function resetAllBoxes() {
     });
 }
 
-// ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
 
 function showError(message) {
     alert(message);
 }
-
+// Функция показа подарка
 function closeGiftPopup() {
     document.getElementById('gift-popup').style.display = 'none';
 }
@@ -200,14 +197,12 @@ function showGiftPopup(message, giftImage) {
 function updateBoxAfterOpen(boxId, giftImage) {
     const boxElement = document.querySelector(`.gift-box[data-id="${boxId}"]`);
     if (!boxElement) return;
-    
-    // Меняем картинку на общую открытую коробку
+     // Меняем картинку коробки на открытую
     const img = boxElement.querySelector('.box-img');
     if (img) {
         img.src = '/static/lab9/opened_box.png';
     }
     
-    // Меняем контейнер и статус
     const container = boxElement.querySelector('.before-open-box');
     if (container) {
         container.className = 'after-open-box';
@@ -218,23 +213,22 @@ function updateBoxAfterOpen(boxId, giftImage) {
         status.textContent = 'Открыта';
     }
     
-    // Убираем замок, если он был
     const lock = boxElement.querySelector('.auth-lock');
     if (lock) {
         lock.style.display = 'none';
     }
     
-    // Помечаем коробку как открытую
     boxElement.classList.add('opened');
 }
 
-// ========== ИНИЦИАЛИЗАЦИЯ ==========
+
 
 document.addEventListener('DOMContentLoaded', function() {
     // Назначаем обработчики на коробки
     const boxes = document.querySelectorAll('.gift-box:not(.opened)');
     boxes.forEach(function(box) {
         box.addEventListener('click', function() {
+            // Проверяем, не открыта ли уже коробка
             if (this.classList.contains('opened')) {
                 showError('Эта коробка уже открыта!');
                 return;
@@ -250,15 +244,6 @@ document.addEventListener('DOMContentLoaded', function() {
         resetBtn.addEventListener('click', resetAllBoxes);
     }
     
-    // Показываем подсказку для коробок с авторизацией
-    const authBoxes = document.querySelectorAll('.gift-box.requires-auth:not(.opened)');
-    authBoxes.forEach(function(box) {
-        box.addEventListener('mouseenter', function() {
-            if (!this.classList.contains('opened') && this.dataset.requiresAuth === 'True') {
-                this.setAttribute('title', '🔒 Требуется авторизация');
-            }
-        });
-    });
 });
 </script>
 {% endblock %}
