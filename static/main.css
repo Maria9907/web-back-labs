@@ -430,7 +430,7 @@ form {
 }
 
 .santa-btn {
-    background: linear-gradient(45deg, #d32f2f, #ff6b6b);
+    background-color: lightpink;
     font-weight: bold;
 }
 
