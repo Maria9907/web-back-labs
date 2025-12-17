@@ -6,7 +6,7 @@
 
 {% block main %}
 <div class="new-year-theme">
-    <h1>🎄 Новогодние поздравления 🎄</h1>
+    <h1> Новогодние поздравления </h1>
     
     
     <div class="user-panel">
@@ -27,7 +27,7 @@
         <p>Вы открыли: <span id="user-opened-count">{{ opened_count }}</span> из 3 коробок</p>
         <p>Осталось закрытых: <span id="closed-count">{{ closed_count }}</span></p>
         {% if is_authenticated %}
-        <p class="auth-status">✅ Вы авторизованы как: {{ user_login }}</p>
+        <p class="auth-status"> Вы авторизованы как: {{ user_login }}</p>
         {% else %}
         <p class="auth-status">Вы не авторизованы</p>
         {% endif %}
