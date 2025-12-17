@@ -420,7 +420,7 @@ form {
 
 .btn {
     padding: 10px 20px;
-    background: linear-gradient(45deg, #1976d2, #42a5f5);
+    background-color: lightpink;
     color: white;
     border: none;
     border-radius: 5px;

@@ -196,7 +196,7 @@ def main():
     # Получаем данные из БД
     boxes = get_all_boxes()
     
-    # Добавляем информацию о защищенных коробках
+    # Добавляем информацию об авторизованных коробках 
     for box in boxes:
         box['requires_auth'] = is_protected_box(box['box_id'])
     
@@ -295,6 +295,8 @@ def register():
 @lab9.route('/lab9/logout')
 def logout():
     """Выход из системы"""
+    #if 'authenticated_opened_count' in session: 
+    #session['guest_opened_count'] = session['authenticated_opened_count']
     session.pop('user_id', None)
     session.pop('user_login', None)
     session.pop('user_full_name', None)
